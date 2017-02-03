@@ -131,8 +131,10 @@ public class OhBotController {
         String strResult = "";
         try {
             if (stock != null) {
+                ClassLoader classLoader = getClass().getClassLoader();
                 List<String> otcs = new FileUtil().readTextFile(
-                        new File(getClass().getClassLoader().getResource("otc_list.txt").getFile()), "utf-8");
+                        new File(classLoader.getResource("otc_list.txt").getFile()), "utf-8");
+                log.info(String.valueOf(otcs.size()));
                 HashMap<String, String> otcNoMap = new HashMap<>();
                 HashMap<String, String> otcNameMap = new HashMap<>();
                 for (String otc : otcs) {
@@ -143,8 +145,9 @@ public class OhBotController {
 
 
                 List<String> tses = new FileUtil()
-                        .readTextFile(new File(getClass().getClassLoader().getResource("tse_list.txt").getFile()),
+                        .readTextFile(new File(classLoader.getResource("tse_list.txt").getFile()),
                                       "utf-8");
+                log.info(String.valueOf(tses.size()));
                 HashMap<String, String> tseNoMap = new HashMap<>();
                 HashMap<String, String> tseNameMap = new HashMap<>();
                 for (String tse : tses) {
@@ -787,9 +790,10 @@ public class OhBotController {
     private void stock(String text, String replyToken) {
         try {
             text = text.replace("@","").replace("?", "").replace("？","");
-
-            List<String> otcs = new FileUtil().readTextFile(
-                    new File(getClass().getClassLoader().getResource("otc_list.txt").getFile()), "utf-8");
+            ClassLoader classLoader = getClass().getClassLoader();
+            List<String> otcs = new FileUtil()
+                    .readTextFile(new File(classLoader.getResource("otc_list.txt").getFile()), "utf-8");
+            log.info(String.valueOf(otcs.size()));
             HashMap<String, String> otcNoMap = new HashMap<>();
             HashMap<String, String> otcNameMap = new HashMap<>();
             for (String otc : otcs) {
@@ -799,22 +803,21 @@ public class OhBotController {
             }
 
             List<String> tses = new FileUtil()
-                    .readTextFile(new File(getClass().getClassLoader().getResource("tse_list.txt").getFile()),
-                                  "utf-8");
+                    .readTextFile(new File(classLoader.getResource("tse_list.txt").getFile()), "utf-8");
+            log.info(String.valueOf(otcs.size()));
             HashMap<String, String> tseNoMap = new HashMap<>();
             HashMap<String, String> tseNameMap = new HashMap<>();
             for (String tse : tses) {
                 String[] s = tse.split("=");
                 tseNoMap.put(s[0], s[1]);
                 tseNameMap.put(s[1], s[0]);
-                log.info(s[0]+" "+s[1]);
             }
 
             String companyType = "";
             Pattern pattern = Pattern.compile("[\\d]{3,}");
             Matcher matcher = pattern.matcher(text);
-            log.info("純數字？　"+text);
             if (matcher.find()) {   //如果是數字
+                log.info("純數字　"+text);
                 if (otcNoMap.get(text) != null) {
                     companyType = "otc";
                 } else {

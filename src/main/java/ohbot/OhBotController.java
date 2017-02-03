@@ -812,8 +812,8 @@ public class OhBotController {
             String companyType = "";
             Pattern pattern = Pattern.compile("[\\d]{3,}");
             Matcher matcher = pattern.matcher(text);
+            log.info("純數字？　"+text);
             if (matcher.find()) {
-                log.info("純數字 "+text);
                 if (otcNoMap.get(text) != null) {
                     companyType = "otc";
                 } else {

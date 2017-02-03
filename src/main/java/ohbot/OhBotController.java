@@ -17,6 +17,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import ohbot.stockObj.MsgArray;
 import ohbot.stockObj.StockData;
+import ohbot.utils.FileUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -27,13 +28,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import retrofit2.Response;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -127,6 +131,50 @@ public class OhBotController {
         String strResult = "";
         try {
             if (stock != null) {
+                List<String> otcs = new FileUtil().readTextFile(
+                        new File(getClass().getClassLoader().getResource("otc_list.txt").getFile()), "utf-8");
+                HashMap<String, String> otcNoMap = new HashMap<>();
+                HashMap<String, String> otcNameMap = new HashMap<>();
+                for (String otc : otcs) {
+                    String[] s = otc.split("=");
+                    otcNoMap.put(s[0], s[1]);
+                    otcNameMap.put(s[1], s[0]);
+                }
+
+
+                List<String> tses = new FileUtil()
+                        .readTextFile(new File(getClass().getClassLoader().getResource("tse_list.txt").getFile()),
+                                      "utf-8");
+                HashMap<String, String> tseNoMap = new HashMap<>();
+                HashMap<String, String> tseNameMap = new HashMap<>();
+                for (String tse : tses) {
+                    String[] s = tse.split("=");
+                    tseNoMap.put(s[0], s[1]);
+                    tseNameMap.put(s[1], s[0]);
+                }
+
+                System.out.println(stock);
+                String companyType = "";
+                Pattern pattern = Pattern.compile("[\\d]{3,}");
+                Matcher matcher = pattern.matcher(stock);
+                if (matcher.find()) {
+                    if (otcNoMap.get(stock) != null) {
+                        companyType = "otc";
+                    } else {
+                        companyType = "tse";
+                    }
+                } else {
+                    if (otcNameMap.get(stock) != null) {
+                        companyType = "otc";
+                        stock = otcNameMap.get(stock);
+                    } else {
+                        companyType = "tse";
+                        stock = tseNameMap.get(stock);
+                    }
+                }
+                System.out.println(stock);
+                System.out.println(companyType);
+
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 String url="http://mis.twse.com.tw/stock/index.jsp";
                 log.info(url);
@@ -134,16 +182,16 @@ public class OhBotController {
                 httpget.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
                 httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
                 httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
-                httpget.setHeader("Cache-Control","max-age=0");
-                httpget.setHeader("Connection","keep-alive");
-                httpget.setHeader("Host","mis.twse.com.tw");
+                httpget.setHeader("Cache-Control", "max-age=0");
+                httpget.setHeader("Connection", "keep-alive");
+                httpget.setHeader("Host", "mis.twse.com.tw");
                 httpget.setHeader("Upgrade-Insecure-Requests", "1");
                 httpget.setHeader("User-Agent",
                                   "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
                 CloseableHttpResponse response = httpClient.execute(httpget);
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
-                url="http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_"+stock+".tw&_="+
-                    Instant.now().toEpochMilli();
+                url = "http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=" + companyType + "_" + stock +
+                      ".tw&_=" + Instant.now().toEpochMilli();
                 log.info(url);
                 httpget = new HttpGet(url);
                 response = httpClient.execute(httpget);
@@ -233,6 +281,14 @@ public class OhBotController {
             e.printStackTrace();
         }
         return strResult;
+    }
+
+
+    private static String createUri(String path) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                                          .path(path).build()
+                                          .toUriString();
+
     }
 
     @EventMapping
@@ -731,6 +787,47 @@ public class OhBotController {
     private void stock(String text, String replyToken) {
         try {
             text = text.replace("@","").replace("?", "").replace("？","");
+
+            List<String> otcs = new FileUtil().readTextFile(
+                    new File(getClass().getClassLoader().getResource("otc_list.txt").getFile()), "utf-8");
+            HashMap<String, String> otcNoMap = new HashMap<>();
+            HashMap<String, String> otcNameMap = new HashMap<>();
+            for (String otc : otcs) {
+                String[] s = otc.split("=");
+                otcNoMap.put(s[0], s[1]);
+                otcNameMap.put(s[1], s[0]);
+            }
+
+            List<String> tses = new FileUtil()
+                    .readTextFile(new File(getClass().getClassLoader().getResource("tse_list.txt").getFile()),
+                                  "utf-8");
+            HashMap<String, String> tseNoMap = new HashMap<>();
+            HashMap<String, String> tseNameMap = new HashMap<>();
+            for (String tse : tses) {
+                String[] s = tse.split("=");
+                tseNoMap.put(s[0], s[1]);
+                tseNameMap.put(s[1], s[0]);
+            }
+
+            String companyType = "";
+            Pattern pattern = Pattern.compile("[\\d]{3,}");
+            Matcher matcher = pattern.matcher(text);
+            if (matcher.find()) {
+                if (otcNoMap.get(text) != null) {
+                    companyType = "otc";
+                } else {
+                    companyType = "tse";
+                }
+            } else {
+                if (otcNameMap.get(text) != null) {
+                    companyType = "otc";
+                    text = otcNameMap.get(text);
+                } else {
+                    companyType = "tse";
+                    text = tseNameMap.get(text);
+                }
+            }
+
             String strResult;
             CloseableHttpClient httpClient = HttpClients.createDefault();
             String url="http://mis.twse.com.tw/stock/index.jsp";
@@ -747,8 +844,8 @@ public class OhBotController {
                               "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
             CloseableHttpResponse response = httpClient.execute(httpget);
             log.info(String.valueOf(response.getStatusLine().getStatusCode()));
-            url="http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_"+text+".tw&_="+
-                Instant.now().toEpochMilli();
+            url = "http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=" + companyType + "_" + text + ".tw&_=" +
+                  Instant.now().toEpochMilli();
             log.info(url);
             httpget = new HttpGet(url);
             response = httpClient.execute(httpget);

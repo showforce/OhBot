@@ -819,6 +819,7 @@ public class OhBotController {
                     companyType = "tse";
                 }
             } else {
+                log.info(text);
                 if (otcNameMap.get(text) != null) {
                     companyType = "otc";
                     text = otcNameMap.get(text);
@@ -826,6 +827,7 @@ public class OhBotController {
                     companyType = "tse";
                     text = tseNameMap.get(text);
                 }
+                log.info(text);
             }
 
             String strResult;

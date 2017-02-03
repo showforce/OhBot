@@ -169,8 +169,6 @@ public class OhBotController {
                         stock = tseNameMap.get(stock);
                     }
                 }
-                System.out.println(stock);
-                System.out.println(companyType);
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 String url="http://mis.twse.com.tw/stock/index.jsp";
@@ -806,7 +804,6 @@ public class OhBotController {
             Pattern pattern = Pattern.compile("[\\d]{3,}");
             Matcher matcher = pattern.matcher(text);
             if (matcher.find()) {   //如果是數字
-                log.info("純數字　"+text);
                 if (otcNoMap.get(text) != null) {
                     companyType = "otc";
                 } else {
@@ -820,7 +817,6 @@ public class OhBotController {
                     companyType = "tse";
                     text = tseNameMap.get(text);
                 }
-                log.info(text);
             }
 
             String strResult;
@@ -869,7 +865,7 @@ public class OhBotController {
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
                     range = " ▿" + decimalFormat.format((diff / yesterday)*100) + "%";
-                    if ((diff / yesterday) <= 10) {
+                    if ((diff / yesterday)*100 <= 10) {
                         range = " ▼" + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 }

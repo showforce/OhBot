@@ -807,20 +807,20 @@ public class OhBotController {
                 String[] s = tse.split("=");
                 tseNoMap.put(s[0], s[1]);
                 tseNameMap.put(s[1], s[0]);
+                log.info(s[0]+" "+s[1]);
             }
 
             String companyType = "";
             Pattern pattern = Pattern.compile("[\\d]{3,}");
             Matcher matcher = pattern.matcher(text);
             log.info("純數字？　"+text);
-            if (matcher.find()) {
+            if (matcher.find()) {   //如果是數字
                 if (otcNoMap.get(text) != null) {
                     companyType = "otc";
                 } else {
                     companyType = "tse";
                 }
-            } else {
-                log.info(text);
+            } else {    //非數字
                 if (otcNameMap.get(text) != null) {
                     companyType = "otc";
                     text = otcNameMap.get(text);

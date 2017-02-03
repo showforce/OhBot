@@ -17,6 +17,17 @@ apply plugin: 'org.springframework.boot'
 
 mainClassName = 'ohbot.OhBotApplication'
 
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java/'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 

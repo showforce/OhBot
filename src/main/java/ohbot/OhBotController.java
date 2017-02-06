@@ -306,13 +306,14 @@ public class OhBotController {
                 AqiResult aqiResult = gson.fromJson(strResult, AqiResult.class);
                 List<Datum> areaData = new ArrayList<>();
                 for(Datum datums:aqiResult.getData()){
-                    if(datums.getAreakey().equals("north")){
+                    if(datums.getAreakey().equals("area")){
                         areaData.add(datums);
                     }
                 }
                 strResult = "";
                 for (Datum datums : areaData) {
                     String aqiStyle = datums.getAQI();
+                    log.info(aqiStyle);
                     if (Integer.parseInt(aqiStyle) <= 50) {
                         aqiStyle = "良好";
                     } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
@@ -1007,6 +1008,7 @@ public class OhBotController {
                     }
                     for (Datum datums : areaData) {
                         String aqiStyle = datums.getAQI();
+                        log.info(datums.getSitename()+" "+datums.getAQI());
                         if (Integer.parseInt(aqiStyle) <= 50) {
                             aqiStyle = "\n   " +"良好";
                         } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {

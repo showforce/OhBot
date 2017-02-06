@@ -1015,21 +1015,21 @@ public class OhBotController {
                         String aqiStyle = datums.getAQI();
                         log.info(datums.getSitename()+" "+datums.getAQI());
                         if (Integer.parseInt(aqiStyle) <= 50) {
-                            aqiStyle = "   " +"良好";
+                            aqiStyle = ":blush: " +"良好";
                         } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
-                            aqiStyle = "   " +"普通";
+                            aqiStyle = ":no_mouth: " +"普通";
                         } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
-                            aqiStyle = "   " +"對敏感族群不健康";
+                            aqiStyle = ":cold_sweat: " +"對敏感族群不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 101 && Integer.parseInt(aqiStyle) <= 200) {
-                            aqiStyle = "   " +"對所有族群不健康";
+                            aqiStyle = ":mask: " +"對所有族群不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 201 && Integer.parseInt(aqiStyle) <= 300) {
-                            aqiStyle = "   " +"非常不健康";
+                            aqiStyle = ":scream: " +"非常不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 301 && Integer.parseInt(aqiStyle) <= 500) {
-                            aqiStyle = "   " +"危害";
+                            aqiStyle = ":imp: " +"危害";
                         }
                         strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() + aqiStyle+"\n";
                     }
-                    this.replyText(replyToken, strResult);
+                    this.replyText(replyToken, EmojiUtils.emojify(strResult));
                 }
             }
         } catch (IOException e) {

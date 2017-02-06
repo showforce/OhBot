@@ -37,10 +37,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.text.DecimalFormat;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1013,6 +1010,9 @@ public class OhBotController {
                     }
                     for (Datum datums : areaData) {
                         String aqiStyle = datums.getAQI();
+                        if (Objects.equals(aqiStyle, "")) {
+                            aqiStyle = "999";
+                        }
                         log.info(datums.getSitename()+" "+datums.getAQI());
                         if (Integer.parseInt(aqiStyle) <= 50) {
                             aqiStyle = ":blush: " +"良好";
@@ -1026,6 +1026,8 @@ public class OhBotController {
                             aqiStyle = ":scream: " +"非常不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 301 && Integer.parseInt(aqiStyle) <= 500) {
                             aqiStyle = ":imp: " +"危害";
+                        } else if (Integer.parseInt(aqiStyle) >= 500) {
+                            aqiStyle = "監測站資料異常";
                         }
                         strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() + aqiStyle+"\n";
                     }

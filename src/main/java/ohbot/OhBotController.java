@@ -372,6 +372,10 @@ public class OhBotController {
         if (text.endsWith("空氣?") || text.endsWith("空氣？")) {
             aqiResult(text, replyToken);
         }
+
+        if (text.endsWith("test?") || text.endsWith("test？")) {
+            myTest(text, replyToken);
+        }
     }
 
     private void replyText(@NonNull String replyToken, @NonNull String message) {
@@ -1030,5 +1034,11 @@ public class OhBotController {
         } catch (IOException e) {
             throw e;
         }
+    }
+
+    private void myTest(String text, String replyToken) throws IOException {
+        String strResult = "";
+        strResult = "(happy) \n :happy: \n \\(happy\\)";
+        this.replyText(replyToken, strResult);
     }
 }

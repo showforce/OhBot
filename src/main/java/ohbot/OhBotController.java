@@ -938,7 +938,7 @@ public class OhBotController {
         log.info(text);
         try {
             if (text.length() <= 3) {
-                String strResult = "";
+                String strResult = "\\(exasperated\\)";
                 String areakey ="";
                 switch (text) {
                     case "北部": {
@@ -1010,17 +1010,17 @@ public class OhBotController {
                         String aqiStyle = datums.getAQI();
                         log.info(datums.getSitename()+" "+datums.getAQI());
                         if (Integer.parseInt(aqiStyle) <= 50) {
-                            aqiStyle = "\n   " +"良好";
+                            aqiStyle = "   " +"良好";
                         } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
-                            aqiStyle = "\n   " +"普通";
+                            aqiStyle = "   " +"普通";
                         } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
-                            aqiStyle = "\n   " +"對敏感族群不健康";
+                            aqiStyle = "   " +"對敏感族群不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 101 && Integer.parseInt(aqiStyle) <= 200) {
-                            aqiStyle = "\n   " +"對所有族群不健康";
+                            aqiStyle = "   " +"對所有族群不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 201 && Integer.parseInt(aqiStyle) <= 300) {
-                            aqiStyle = "\n   " +"非常不健康";
+                            aqiStyle = "   " +"非常不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 301 && Integer.parseInt(aqiStyle) <= 500) {
-                            aqiStyle = "\n   " +"危害";
+                            aqiStyle = "   " +"危害";
                         }
                         strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() + aqiStyle+"\n";
                     }

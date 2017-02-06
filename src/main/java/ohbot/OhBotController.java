@@ -1022,7 +1022,7 @@ public class OhBotController {
                         }
                         strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() + aqiStyle+"\n";
                     }
-
+                    this.replyText(replyToken, strResult);
                 }
             }
         } catch (IOException e) {

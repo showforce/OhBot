@@ -938,7 +938,7 @@ public class OhBotController {
         log.info(text);
         try {
             if (text.length() <= 3) {
-                String strResult = "";
+                String strResult = "(wink)";
                 String areakey ="";
                 switch (text) {
                     case "北部": {

@@ -13,6 +13,7 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
+import com.vdurmont.emoji.EmojiParser;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import ohbot.aqiObj.AqiResult;
@@ -1039,6 +1040,7 @@ public class OhBotController {
     private void myTest(String text, String replyToken) throws IOException {
         String strResult = "";
         strResult = "(smile) \n :smile: \n \\(smile\\) \n smile ";
-        this.replyText(replyToken, strResult);
+        String result = EmojiParser.parseToUnicode(strResult);
+        this.replyText(replyToken, result);
     }
 }

@@ -1018,9 +1018,9 @@ public class OhBotController {
                             aqiStyle = ":blush: " +"良好";
                         } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
                             aqiStyle = ":no_mouth: " +"普通";
-                        } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
+                        } else if (Integer.parseInt(aqiStyle) >= 101 && Integer.parseInt(aqiStyle) <= 150) {
                             aqiStyle = ":cold_sweat: " +"對敏感族群不健康";
-                        } else if (Integer.parseInt(aqiStyle) >= 101 && Integer.parseInt(aqiStyle) <= 200) {
+                        } else if (Integer.parseInt(aqiStyle) >= 151 && Integer.parseInt(aqiStyle) <= 200) {
                             aqiStyle = ":mask: " +"對所有族群不健康";
                         } else if (Integer.parseInt(aqiStyle) >= 201 && Integer.parseInt(aqiStyle) <= 300) {
                             aqiStyle = ":scream: " +"非常不健康";

@@ -15,10 +15,11 @@ import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import ohbot.aqiObj.AqiResult;
+import ohbot.aqiObj.Datum;
 import ohbot.stockObj.MsgArray;
 import ohbot.stockObj.StockData;
 import ohbot.stockObj.StockList;
-import ohbot.utils.FileUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,14 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import retrofit2.Response;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.text.DecimalFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -195,7 +195,9 @@ public class OhBotController {
                 strResult = "";
 
                 Gson gson = new GsonBuilder().create();
-                StockData stockData = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"), StockData.class);
+                String s =EntityUtils.toString(httpEntity, "utf-8");
+                System.out.println(s);
+                StockData stockData = gson.fromJson(s, StockData.class);
                 for(MsgArray msgArray:stockData.getMsgArray()){
                     DecimalFormat decimalFormat = new DecimalFormat("#.##");
                     Double nowPrice = Double.valueOf(msgArray.getZ());
@@ -278,13 +280,61 @@ public class OhBotController {
         return strResult;
     }
 
+    @RequestMapping("/aqi")
+    public String aqi(@RequestParam(value = "area") String area) {
+        String strResult = "";
+        try {
+            if (area != null) {
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+                String url="http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa";
+                log.info(url);
+                HttpGet httpget = new HttpGet(url);
+                httpget.setHeader("Host","taqm.epa.gov.tw");
+                httpget.setHeader("Connection","keep-alive");
+                httpget.setHeader("Accept","*/*");
+                httpget.setHeader("X-Requested-With","XMLHttpRequest");
+                httpget.setHeader("User-Agent",
+                                  "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+                httpget.setHeader("Referer","http://taqm.epa.gov.tw/taqm/aqi-map.aspx");
+                httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
+                httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
 
-    private static String createUri(String path) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                                          .path(path).build()
-                                          .toUriString();
-
+                CloseableHttpResponse response = httpClient.execute(httpget);
+                HttpEntity httpEntity = response.getEntity();
+                strResult =  EntityUtils.toString(httpEntity, "big5").toLowerCase();
+                Gson gson = new GsonBuilder().create();
+                AqiResult aqiResult = gson.fromJson(strResult, AqiResult.class);
+                List<Datum> areaData = new ArrayList<>();
+                for(Datum datums:aqiResult.getData()){
+                    if(datums.getAreakey().equals("north")){
+                        areaData.add(datums);
+                    }
+                }
+                strResult = "";
+                for (Datum datums : areaData) {
+                    String aqiStyle = datums.getAQI();
+                    if (Integer.parseInt(aqiStyle) <= 50) {
+                        aqiStyle = "良好";
+                    } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
+                        aqiStyle = "普通";
+                    } else if (Integer.parseInt(aqiStyle) >= 101 && Integer.parseInt(aqiStyle) <= 150) {
+                        aqiStyle = "對敏感族群不健康";
+                    } else if (Integer.parseInt(aqiStyle) >= 151 && Integer.parseInt(aqiStyle) <= 200) {
+                        aqiStyle = "對所有族群不健康";
+                    } else if (Integer.parseInt(aqiStyle) >= 201 && Integer.parseInt(aqiStyle) <= 300) {
+                        aqiStyle = "非常不健康";
+                    } else if (Integer.parseInt(aqiStyle) >= 301 && Integer.parseInt(aqiStyle) <= 500) {
+                        aqiStyle = "危害";
+                    }
+                    strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() +"\n   " + aqiStyle+"\n";
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return strResult;
     }
+
 
     @EventMapping
     public void handleDefaultMessageEvent(Event event) {
@@ -316,6 +366,10 @@ public class OhBotController {
 
         if ((text.startsWith("@") && text.endsWith("?")) || (text.startsWith("@") && text.endsWith("？"))) {
             stock(text, replyToken);
+        }
+
+        if (text.endsWith("空氣?") || text.endsWith("空氣？")) {
+            aqiResult(text, replyToken);
         }
     }
 
@@ -875,6 +929,104 @@ public class OhBotController {
             this.replyText(replyToken, strResult);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void aqiResult(String text, String replyToken) throws IOException {
+        text = text.replace("空氣", "").replace("?", "").replace("？", "").trim();
+        log.info(text);
+        try {
+            if (text.length() <= 3) {
+                String strResult = "";
+                String areakey ="";
+                switch (text) {
+                    case "北部": {
+                        areakey="north";
+                        break;
+                    }
+                    case "竹苗": {
+                        areakey="chu-miao";
+                        break;
+                    }
+                    case "中部": {
+                        areakey="central";
+                        break;
+                    }
+                    case "雲嘉南": {
+                        areakey="yun-chia-nan";
+                        break;
+                    }
+                    case "高屏": {
+                        areakey="kaoping";
+                        break;
+                    }
+                    case "花東": {
+                        areakey="hua-tung";
+                        break;
+                    }
+                    case "宜蘭": {
+                        areakey="yilan";
+                        break;
+                    }
+                    case "外島": {
+                        areakey="island";
+                        break;
+                    }
+                    default:
+                        text="";
+
+                }
+                if(text.equals("")){
+                    strResult = "義大利?維大力? \n請輸入 這些地區：\n北部 竹苗 中部 \n雲嘉南 高屏 花東 \n宜蘭 外島";
+                    this.replyText(replyToken, strResult);
+                }else{
+                    CloseableHttpClient httpClient = HttpClients.createDefault();
+                    String url="http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa";
+                    log.info(url);
+                    HttpGet httpget = new HttpGet(url);
+                    httpget.setHeader("Host","taqm.epa.gov.tw");
+                    httpget.setHeader("Connection","keep-alive");
+                    httpget.setHeader("Accept","*/*");
+                    httpget.setHeader("X-Requested-With","XMLHttpRequest");
+                    httpget.setHeader("User-Agent",
+                                      "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+                    httpget.setHeader("Referer","http://taqm.epa.gov.tw/taqm/aqi-map.aspx");
+                    httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
+                    httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+
+                    CloseableHttpResponse response = httpClient.execute(httpget);
+                    HttpEntity httpEntity = response.getEntity();
+                    String pageContent =  EntityUtils.toString(httpEntity, "big5").toLowerCase();
+                    Gson gson = new GsonBuilder().create();
+                    AqiResult aqiResult = gson.fromJson(pageContent, AqiResult.class);
+                    List<Datum> areaData = new ArrayList<>();
+                    for(Datum datums:aqiResult.getData()){
+                        if(datums.getAreakey().equals(areakey)){
+                            areaData.add(datums);
+                        }
+                    }
+                    for (Datum datums : areaData) {
+                        String aqiStyle = datums.getAQI();
+                        if (Integer.parseInt(aqiStyle) <= 50) {
+                            aqiStyle = "\n   " +"良好";
+                        } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
+                            aqiStyle = "\n   " +"普通";
+                        } else if (Integer.parseInt(aqiStyle) >= 51 && Integer.parseInt(aqiStyle) <= 100) {
+                            aqiStyle = "\n   " +"對敏感族群不健康";
+                        } else if (Integer.parseInt(aqiStyle) >= 101 && Integer.parseInt(aqiStyle) <= 200) {
+                            aqiStyle = "\n   " +"對所有族群不健康";
+                        } else if (Integer.parseInt(aqiStyle) >= 201 && Integer.parseInt(aqiStyle) <= 300) {
+                            aqiStyle = "\n   " +"非常不健康";
+                        } else if (Integer.parseInt(aqiStyle) >= 301 && Integer.parseInt(aqiStyle) <= 500) {
+                            aqiStyle = "\n   " +"危害";
+                        }
+                        strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() + aqiStyle+"\n";
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            throw e;
         }
     }
 }

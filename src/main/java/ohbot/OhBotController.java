@@ -1038,7 +1038,7 @@ public class OhBotController {
 
     private void myTest(String text, String replyToken) throws IOException {
         String strResult = "";
-        strResult = "(happy) \n :happy: \n \\(happy\\)";
+        strResult = "(happy) \n :happy: \n \\(happy\\) \nhappy ";
         this.replyText(replyToken, strResult);
     }
 }

@@ -1129,10 +1129,10 @@ public class OhBotController {
                     strResult = EntityUtils.toString(httpEntity, "utf-8");
                     strResult = strResult.substring(strResult.indexOf("<td>現鈔買入</td>"), strResult.length());
                     strResult = strResult.substring(0, strResult.indexOf("</table>"));
-                    strResult = strResult.replaceAll("</a></td>", ":arrow_right:");
+                    strResult = strResult.replaceAll("</a></td>", ":moneybag:");
                     strResult = strResult.replaceAll("<[^>]*>", "");
                     strResult = strResult.replaceAll("[\\s]{1,}", "");
-                    strResult = strResult.replaceAll("現鈔賣出", "\n現鈔賣出");
+                    strResult = strResult.replaceAll("現鈔賣出", "\n:money_with_wings:現鈔賣出");
                     strResult = strResult.replaceAll("現鈔買入", ":dollar:現鈔買入");
 
                     this.replyText(replyToken, EmojiUtils.emojify(strResult));

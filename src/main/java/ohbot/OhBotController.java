@@ -334,6 +334,34 @@ public class OhBotController {
         return strResult;
     }
 
+    @RequestMapping("/rate")
+    public String rate(@RequestParam(value = "rate") String country) {
+        String strResult = "";
+        try {
+            if (country != null) {
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+                String url="http://m.findrate.tw/"+country+"/";
+                log.info(url);
+                HttpGet httpget = new HttpGet(url);
+                CloseableHttpResponse response = httpClient.execute(httpget);
+                log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+                HttpEntity httpEntity = response.getEntity();
+                strResult = EntityUtils.toString(httpEntity, "utf-8");
+                strResult = strResult.substring(strResult.indexOf("<td>現鈔買入</td>"), strResult.length());
+                strResult = strResult.substring(0, strResult.indexOf("</table>"));
+                strResult = strResult.replaceAll("</a></td>", " ");
+                strResult = strResult.replaceAll("<[^>]*>", "");
+                strResult = strResult.replaceAll("[\\s]{1,}", "");
+                strResult = strResult.replaceAll("現鈔賣出", "\n現鈔賣出");
+                strResult = strResult.replaceAll("現鈔買入", ":dollar:現鈔買入");
+                System.out.println(EmojiUtils.emojify(strResult));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return strResult;
+    }
+
 
     @EventMapping
     public void handleDefaultMessageEvent(Event event) {
@@ -369,6 +397,10 @@ public class OhBotController {
 
         if (text.endsWith("空氣?") || text.endsWith("空氣？")) {
             aqiResult(text, replyToken);
+        }
+
+        if (text.endsWith("匯率?") || text.endsWith("匯率？")) {
+            rate(text, replyToken);
         }
 
         if (text.endsWith("test?") || text.endsWith("test？")) {
@@ -1031,6 +1063,78 @@ public class OhBotController {
                         }
                         strResult = strResult + datums.getSitename() + " AQI : " + datums.getAQI() + aqiStyle+"\n";
                     }
+                    this.replyText(replyToken, EmojiUtils.emojify(strResult));
+                }
+            }
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    private void rate(String text, String replyToken) throws IOException {
+        text = text.replace("匯率", "").replace("?", "").replace("？", "").trim();
+        log.info(text);
+        try {
+            if (text.length() <= 3) {
+                String strResult = "";
+                String country ="";
+                switch (text) {
+                    case "美金": {
+                        country="USD";
+                        break;
+                    }
+                    case "日圓": {
+                        country="JPY";
+                        break;
+                    }
+                    case "人民幣": {
+                        country="CNY";
+                        break;
+                    }
+                    case "歐元": {
+                        country="EUR";
+                        break;
+                    }
+                    case "港幣": {
+                        country="HKD";
+                        break;
+                    }
+                    case "英鎊": {
+                        country="GBP";
+                        break;
+                    }
+                    case "韓元": {
+                        country="KRW";
+                        break;
+                    }
+                    case "越南盾": {
+                        country="VND";
+                        break;
+                    }
+                    default:
+                        text="";
+
+                }
+                if(text.equals("")){
+                    strResult = "義大利?維大力? \n請輸入 這些幣別：\n美金 日圓 人民幣 歐元 \n港幣 英鎊 韓元 越南盾";
+                    this.replyText(replyToken, strResult);
+                }else{
+                    CloseableHttpClient httpClient = HttpClients.createDefault();
+                    String url="http://m.findrate.tw/"+country+"/";
+                    log.info(url);
+                    HttpGet httpget = new HttpGet(url);
+                    CloseableHttpResponse response = httpClient.execute(httpget);
+                    log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+                    HttpEntity httpEntity = response.getEntity();
+                    strResult = EntityUtils.toString(httpEntity, "utf-8");
+                    strResult = strResult.substring(strResult.indexOf("<td>現鈔買入</td>"), strResult.length());
+                    strResult = strResult.substring(0, strResult.indexOf("</table>"));
+                    strResult = strResult.replaceAll("</a></td>", ":arrow_right:");
+                    strResult = strResult.replaceAll("<[^>]*>", "");
+                    strResult = strResult.replaceAll("[\\s]{1,}", "");
+                    strResult = strResult.replaceAll("現鈔賣出", "\n現鈔賣出");
+                    strResult = strResult.replaceAll("現鈔買入", ":dollar:現鈔買入");
+
                     this.replyText(replyToken, EmojiUtils.emojify(strResult));
                 }
             }

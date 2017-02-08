@@ -949,13 +949,13 @@ public class OhBotController {
                     change = " +" + decimalFormat.format(diff);
                     range = EmojiUtils.emojify(":thumbsup:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     if ((diff / yesterday)*100 >= 10) {
-                        range = " ▲" + decimalFormat.format((diff / yesterday)*100) + "%";
+                        range = EmojiUtils.emojify(":red_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
                     range = EmojiUtils.emojify(":thumbsdown:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     if ((diff / yesterday)*100*-1 >= 10) {
-                        range = " ▼" + decimalFormat.format((diff / yesterday)*100) + "%";
+                        range = EmojiUtils.emojify(":green_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 }
                 //開盤 : "+msgArray.getO()+"\n昨收 : "+msgArray.getY()+"

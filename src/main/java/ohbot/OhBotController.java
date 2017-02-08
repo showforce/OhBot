@@ -947,14 +947,14 @@ public class OhBotController {
                     range = " " + "-";
                 } else if (diff > 0) {
                     change = " +" + decimalFormat.format(diff);
-                    range = " ▵" + decimalFormat.format((diff / yesterday)*100) + "%";
+                    range = EmojiUtils.emojify(":thumbsup:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     if ((diff / yesterday)*100 >= 10) {
                         range = " ▲" + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
-                    range = " ▿" + decimalFormat.format((diff / yesterday)*100) + "%";
-                    if ((diff / yesterday)*100 <= 10) {
+                    range = EmojiUtils.emojify(":thumbsdown:") + decimalFormat.format((diff / yesterday)*100) + "%";
+                    if ((diff / yesterday)*100*-1 >= 10) {
                         range = " ▼" + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 }

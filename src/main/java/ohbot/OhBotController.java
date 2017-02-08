@@ -209,13 +209,13 @@ public class OhBotController {
                     } else if (diff > 0) {
                         change = " +" + decimalFormat.format(diff);
                         range = " ▵" + decimalFormat.format((diff / yesterday)*100) + "%";
-                        if ((diff / yesterday)*100 >= 10) {
+                        if ((diff / yesterday)*100 >= 9.999) {
                             range = " ▲" + decimalFormat.format((diff / yesterday)*100) + "%";
                         }
                     } else {
                         change = " -" + decimalFormat.format(diff*(-1));
                         range = " ▿" + decimalFormat.format((diff / yesterday)*100) + "%";
-                        if ((diff / yesterday) <= 10) {
+                        if ((diff / yesterday)*100*-1 >= 9.999) {
                             range = " ▼" + decimalFormat.format((diff / yesterday)*100) + "%";
                         }
                     }
@@ -948,13 +948,13 @@ public class OhBotController {
                 } else if (diff > 0 && diff < 10) {
                     change = " +" + decimalFormat.format(diff);
                     range = EmojiUtils.emojify(":thumbsup:") + decimalFormat.format((diff / yesterday)*100) + "%";
-                    if ((diff / yesterday)*100 >= 10) {
+                    if ((diff / yesterday)*100 >= 9.9999) {
                         range = EmojiUtils.emojify(":red_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
                     range = EmojiUtils.emojify(":thumbsdown:") + decimalFormat.format((diff / yesterday)*100) + "%";
-                    if ((diff / yesterday)*100*-1 >= 10) {
+                    if ((diff / yesterday)*100*-1 >= 9.9999) {
                         range = EmojiUtils.emojify(":green_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 }

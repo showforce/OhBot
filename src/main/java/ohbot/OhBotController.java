@@ -945,7 +945,7 @@ public class OhBotController {
                 if (diff == 0) {
                     change = " " + diff;
                     range = " " + "-";
-                } else if (diff > 0 && diff < 10) {
+                } else if (diff > 0) {
                     change = " +" + decimalFormat.format(diff);
                     range = EmojiUtils.emojify(":thumbsup:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     if ((diff / yesterday)*100 >= 9.9999) {

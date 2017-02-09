@@ -215,7 +215,7 @@ public class OhBotController {
                         }
                     } else {
                         change = " -" + decimalFormat.format(diff*(-1));
-                        if (nowPrice == Double.valueOf(msgArray.getW())) {
+                        if (nowPrice == Double.parseDouble(msgArray.getW())) {
                             range = EmojiUtils.emojify(":green_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
                         }else{
                             range = EmojiUtils.emojify(":chart_with_downwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";
@@ -956,7 +956,7 @@ public class OhBotController {
                     }
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
-                    if (nowPrice == Double.valueOf(msgArray.getW())) {
+                    if (nowPrice == Double.parseDouble(msgArray.getW())) {
                         range = EmojiUtils.emojify(":green_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }else{
                         range = EmojiUtils.emojify(":chart_with_downwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";

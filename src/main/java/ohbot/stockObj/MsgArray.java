@@ -40,8 +40,10 @@ public class MsgArray {
     private String h;
     private String ip;
     private String i;
+    //跌停價
     private String w;
     private String v;
+    //漲停價
     private String u;
     private String t;
     private String s;

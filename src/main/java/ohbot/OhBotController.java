@@ -208,15 +208,17 @@ public class OhBotController {
                         range = " " + "-";
                     } else if (diff > 0) {
                         change = " +" + decimalFormat.format(diff);
-                        range = " ▵" + decimalFormat.format((diff / yesterday)*100) + "%";
-                        if ((diff / yesterday)*100 >= 9.999) {
-                            range = " ▲" + decimalFormat.format((diff / yesterday)*100) + "%";
+                        if (nowPrice == Double.parseDouble(msgArray.getU())) {
+                            range = EmojiUtils.emojify(":red_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
+                        }else{
+                            range = EmojiUtils.emojify(":chart_with_upwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";
                         }
                     } else {
                         change = " -" + decimalFormat.format(diff*(-1));
-                        range = " ▿" + decimalFormat.format((diff / yesterday)*100) + "%";
-                        if ((diff / yesterday)*100*-1 >= 9.999) {
-                            range = " ▼" + decimalFormat.format((diff / yesterday)*100) + "%";
+                        if (nowPrice == Double.valueOf(msgArray.getW())) {
+                            range = EmojiUtils.emojify(":green_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
+                        }else{
+                            range = EmojiUtils.emojify(":chart_with_downwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";
                         }
                     }
                     //開盤 : "+msgArray.getO()+"\n昨收 : "+msgArray.getY()+"
@@ -947,15 +949,17 @@ public class OhBotController {
                     range = " " + "-";
                 } else if (diff > 0) {
                     change = " +" + decimalFormat.format(diff);
-                    range = EmojiUtils.emojify(":thumbsup:") + decimalFormat.format((diff / yesterday)*100) + "%";
-                    if ((diff / yesterday)*100 >= 9.9999) {
+                    if (nowPrice == Double.parseDouble(msgArray.getU())) {
                         range = EmojiUtils.emojify(":red_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
+                    }else{
+                        range = EmojiUtils.emojify(":chart_with_upwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
-                    range = EmojiUtils.emojify(":thumbsdown:") + decimalFormat.format((diff / yesterday)*100) + "%";
-                    if ((diff / yesterday)*100*-1 >= 9.9999) {
+                    if (nowPrice == Double.valueOf(msgArray.getW())) {
                         range = EmojiUtils.emojify(":green_circle:") + decimalFormat.format((diff / yesterday)*100) + "%";
+                    }else{
+                        range = EmojiUtils.emojify(":chart_with_downwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 }
                 //開盤 : "+msgArray.getO()+"\n昨收 : "+msgArray.getY()+"

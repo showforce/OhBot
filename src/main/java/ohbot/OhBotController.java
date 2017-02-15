@@ -21,6 +21,7 @@ import ohbot.aqiObj.Datum;
 import ohbot.stockObj.MsgArray;
 import ohbot.stockObj.StockData;
 import ohbot.stockObj.StockList;
+import ohbot.stockObj.TseStock;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -231,6 +232,34 @@ public class OhBotController {
         return strResult;
     }
 
+    @RequestMapping("/tse")
+    public String tseStock() {
+        String strResult = "";
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            String url = "http://www.tse.com.tw/api/get.php?method=home_summary";
+            log.info(url);
+            HttpGet httpget = new HttpGet(url);
+            httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            httpget.setHeader("Accept-Encoding", "gzip, deflate, sdch");
+            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+            httpget.setHeader("Cache-Control", "max-age=0");
+            httpget.setHeader("Connection", "keep-alive");
+            httpget.setHeader("Host", "mis.twse.com.tw");
+            httpget.setHeader("Upgrade-Insecure-Requests", "1");
+            httpget.setHeader("User-Agent",
+                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+            CloseableHttpResponse response = httpClient.execute(httpget);
+            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+            Gson gson = new GsonBuilder().create();
+            strResult = EntityUtils.toString(response.getEntity(), "utf-8");
+            TseStock tseStock = gson.fromJson(strResult, TseStock.class);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return strResult;
+    }
+
     @RequestMapping("/start")
     public String start(@RequestParam(value = "start") String start) {
         String strResult = "";
@@ -405,8 +434,12 @@ public class OhBotController {
             rate(text, replyToken);
         }
 
-        if (text.endsWith("test?") || text.endsWith("test？")) {
-            myTest(text, replyToken);
+        if (text.endsWith("呆股?") || text.endsWith("呆股？")) {
+            tse(text, replyToken);
+        }
+
+        if (text.endsWith("@?") || text.endsWith("@？")) {
+            help(text, replyToken);
         }
     }
 
@@ -1147,9 +1180,39 @@ public class OhBotController {
         }
     }
 
-    private void myTest(String text, String replyToken) throws IOException {
+    private void tse(String text, String replyToken) throws IOException {
+        log.info(text);
         String strResult = "";
-        strResult = "(smile) \n :smile: \n \\(smile\\) \n smile ";
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            String url = "http://www.tse.com.tw/api/get.php?method=home_summary";
+            log.info(url);
+            HttpGet httpget = new HttpGet(url);
+            httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            httpget.setHeader("Accept-Encoding", "gzip, deflate, sdch");
+            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+            httpget.setHeader("Cache-Control", "max-age=0");
+            httpget.setHeader("Connection", "keep-alive");
+            httpget.setHeader("Host", "mis.twse.com.tw");
+            httpget.setHeader("Upgrade-Insecure-Requests", "1");
+            httpget.setHeader("User-Agent",
+                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+            CloseableHttpResponse response = httpClient.execute(httpget);
+            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+            Gson gson = new GsonBuilder().create();
+            String content = EntityUtils.toString(response.getEntity(), "utf-8");
+            TseStock tseStock = gson.fromJson(content, TseStock.class);
+            strResult = "加權 : " + tseStock.getTSE_I() + " 成交金額(億) : " + tseStock.getTSE_V()+"\n";
+            strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + " 成交金額(億) : " + tseStock.getOTC_V();
+            this.replyText(replyToken, strResult);
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    private void help(String text, String replyToken) throws IOException {
+        String strResult = "";
+        strResult = "@2330? \n @台積電? \n  \n  ";
         String result = EmojiUtils.emojify(strResult);
         this.replyText(replyToken, result);
     }

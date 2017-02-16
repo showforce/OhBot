@@ -1063,7 +1063,7 @@ public class OhBotController {
                     httpget.setHeader("User-Agent",
                                       "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
                     httpget.setHeader("Referer","http://taqm.epa.gov.tw/taqm/aqi-map.aspx");
-                    httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
+                    httpget.setHeader("Accept-Encoding", "gzip, deflate, sdch");
                     httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
 
                     CloseableHttpResponse response = httpClient.execute(httpget);
@@ -1202,9 +1202,25 @@ public class OhBotController {
             Gson gson = new GsonBuilder().create();
             String content = EntityUtils.toString(response.getEntity(), "utf-8");
             TseStock tseStock = gson.fromJson(content, TseStock.class);
-            strResult = "加權 : " + tseStock.getTSE_I() + " " + tseStock.getTSE_D() + " " + tseStock.getTSE_P() +
-                        "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
-            strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + " 成交金額(億) : " + tseStock.getOTC_V();
+            if (tseStock.getTSE_D() > 0) {
+                strResult = "加權 : " + tseStock.getTSE_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
+                            tseStock.getTSE_D() + " " + tseStock.getTSE_P() +
+                            "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
+            } else {
+                strResult = "加權 : " + tseStock.getTSE_I() + EmojiUtils.emojify(":chart_with_downwards_trend:") +
+                            tseStock.getTSE_D() + " " + tseStock.getTSE_P() +
+                            "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
+            }
+            if (tseStock.getOTC_I() > 0) {
+                strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
+                            tseStock.getOTC_D() + " " + tseStock.getOTC_P() +
+                            "% \n成交金額(億) : " + tseStock.getOTC_V() + "\n";
+            } else {
+                strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
+                            tseStock.getOTC_D() + " " + tseStock.getOTC_P() +
+                            "% \n成交金額(億) : " + tseStock.getOTC_V() + "\n";
+            }
+
             this.replyText(replyToken, strResult);
         } catch (IOException e) {
             throw e;

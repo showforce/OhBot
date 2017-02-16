@@ -1202,7 +1202,8 @@ public class OhBotController {
             Gson gson = new GsonBuilder().create();
             String content = EntityUtils.toString(response.getEntity(), "utf-8");
             TseStock tseStock = gson.fromJson(content, TseStock.class);
-            strResult = "加權 : " + tseStock.getTSE_I() + " 成交金額(億) : " + tseStock.getTSE_V()+"\n";
+            strResult = "加權 : " + tseStock.getTSE_I() + " " + tseStock.getTSE_D() + " " + tseStock.getTSE_P() +
+                        "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
             strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + " 成交金額(億) : " + tseStock.getOTC_V();
             this.replyText(replyToken, strResult);
         } catch (IOException e) {

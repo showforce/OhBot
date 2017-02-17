@@ -457,7 +457,7 @@ public class OhBotController {
         String data = event.getPostbackContent().getData();
         switch (data) {
             case "more:1": {
-                this.replyText(replyToken, "Comming soon!");
+                this.replyText(replyToken, "Coming soon!");
                 break;
             }
             default:
@@ -1261,7 +1261,7 @@ public class OhBotController {
                         new PostbackAction("更多","more:1")
                 )
         );
-        TemplateMessage templateMessage = new TemplateMessage("The function Only in mobile. ", buttonsTemplate);
+        TemplateMessage templateMessage = new TemplateMessage("The function Only on mobile device ! ", buttonsTemplate);
         this.reply(replyToken, templateMessage);
     }
 }

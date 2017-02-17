@@ -1262,8 +1262,8 @@ public class OhBotController {
     }
 
     private void help(String text, String replyToken) throws IOException {
-        String imageUrl = "";
-        ButtonsTemplate buttonsTemplate = new ButtonsTemplate(imageUrl,"安安你好","",
+        String imageUrl = "https://p1.bqimg.com/524586/f7f88ef91547655cs.png";
+        ButtonsTemplate buttonsTemplate = new ButtonsTemplate(imageUrl,"安安","你好",
                 Arrays.asList(
                         new MessageAction("查個股股價","輸入 @2331? 或 @台積電?"),
                         new MessageAction("查加權上櫃指數","輸入 呆股?"),

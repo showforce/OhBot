@@ -1262,16 +1262,16 @@ public class OhBotController {
     }
 
     private void help(String text, String replyToken) throws IOException {
-        String imageUrl = "https://www.facebook.com/images/fb_icon_325x325.png";
+        String imageUrl = "";
         ButtonsTemplate buttonsTemplate = new ButtonsTemplate(imageUrl,"安安你好","",
                 Arrays.asList(
                         new MessageAction("查個股股價","輸入 @2331? 或 @台積電?"),
                         new MessageAction("查加權上櫃指數","輸入 呆股?"),
-                        new MessageAction("查匯率","輸入 美金匯率?"),
-                        new PostbackAction("更多","")
+                        new MessageAction("查匯率","輸入 美金匯率?")
+                        //new PostbackAction("更多","")
                 )
         );
-        TemplateMessage templateMessage = new TemplateMessage("Sorry, Unsupport the function in your platform. ", buttonsTemplate);
+        TemplateMessage templateMessage = new TemplateMessage("Unsupport the function in your platform. ", buttonsTemplate);
         this.reply(replyToken, templateMessage);
     }
 }

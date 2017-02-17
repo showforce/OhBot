@@ -1205,20 +1205,20 @@ public class OhBotController {
             TseStock tseStock = gson.fromJson(content, TseStock.class);
             if (tseStock.getTSE_D() > 0) {
                 strResult = "加權 : " + tseStock.getTSE_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
-                            tseStock.getTSE_D() + " " + tseStock.getTSE_P() +
+                            tseStock.getTSE_D() + EmojiUtils.emojify(":chart_with_upwards_trend:") + tseStock.getTSE_P() +
                             "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
             } else {
                 strResult = "加權 : " + tseStock.getTSE_I() + EmojiUtils.emojify(":chart_with_downwards_trend:") +
-                            tseStock.getTSE_D() + " " + tseStock.getTSE_P() +
+                            tseStock.getTSE_D() + EmojiUtils.emojify(":chart_with_downwards_trend:") + tseStock.getTSE_P() +
                             "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
             }
             if (tseStock.getOTC_I() > 0) {
                 strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
-                            tseStock.getOTC_D() + " " + tseStock.getOTC_P() +
+                            tseStock.getOTC_D() + EmojiUtils.emojify(":chart_with_upwards_trend:") + tseStock.getOTC_P() +
                             "% \n成交金額(億) : " + tseStock.getOTC_V() + "\n";
             } else {
-                strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
-                            tseStock.getOTC_D() + " " + tseStock.getOTC_P() +
+                strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + EmojiUtils.emojify(":chart_with_downwards_trend:") +
+                            tseStock.getOTC_D() + EmojiUtils.emojify(":chart_with_downwards_trend:") + tseStock.getOTC_P() +
                             "% \n成交金額(億) : " + tseStock.getOTC_V() + "\n";
             }
 

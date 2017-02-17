@@ -437,11 +437,11 @@ public class OhBotController {
             aqiResult(text, replyToken);
         }
 
-        if (text.endsWith("匯率?") || text.endsWith("匯率？")) {
+        if (text.startsWith("匯率?") || text.startsWith("匯率？")) {
             rate(text, replyToken);
         }
 
-        if (text.endsWith("呆股?") || text.endsWith("呆股？")) {
+        if (text.startsWith("呆股?") || text.startsWith("呆股？")) {
             tse(text, replyToken);
         }
 
@@ -455,21 +455,11 @@ public class OhBotController {
         log.info("Got postBack event: {}", event);
         String replyToken = event.getReplyToken();
         String data = event.getPostbackContent().getData();
-        Source source = event.getSource();
         switch (data) {
-            case "bye:yes": {
-                this.replyText(replyToken, "Bye, see you again ...");
-                lineMessagingService.leaveGroup(
-                        ((GroupSource) source).getGroupId()
-                ).execute();
+            case "more:1": {
+                this.replyText(replyToken, "Comming soon!");
                 break;
             }
-
-            case "bye:no": {
-                this.replyText(replyToken, "Ok, let us keep talking!");
-                break;
-            }
-
             default:
                 this.replyText(replyToken, "Got postback event : " + event.getPostbackContent().getData());
         }
@@ -1267,11 +1257,11 @@ public class OhBotController {
                 Arrays.asList(
                         new MessageAction("查個股股價","輸入 @2331? 或 @台積電?"),
                         new MessageAction("查加權上櫃指數","輸入 呆股?"),
-                        new MessageAction("查匯率","輸入 美金匯率?")
-                        //new PostbackAction("更多","")
+                        new MessageAction("查匯率","輸入 美金匯率?"),
+                        new PostbackAction("更多","more:1")
                 )
         );
-        TemplateMessage templateMessage = new TemplateMessage("Unsupport the function in your platform. ", buttonsTemplate);
+        TemplateMessage templateMessage = new TemplateMessage("The function Only in mobile. ", buttonsTemplate);
         this.reply(replyToken, templateMessage);
     }
 }

@@ -494,6 +494,7 @@ public class OhBotController {
             Response<BotApiResponse> apiResponse = lineMessagingService
                     .replyMessage(new ReplyMessage(replyToken, messages))
                     .execute();
+            log.info("Sent messages: {} {}", apiResponse.message(), apiResponse.code());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -1257,7 +1257,7 @@ public class OhBotController {
                 Arrays.asList(
                         new MessageAction("查個股股價","輸入 @2331? 或 @台積電?"),
                         new MessageAction("查加權上櫃指數","輸入 呆股?"),
-                        new MessageAction("查匯率","輸入 美金匯率?"),
+                        new MessageAction("查匯率","輸入 美金匯率? 或 匯率? 檢視可查匯率"),
                         new PostbackAction("更多","more:1")
                 )
         );

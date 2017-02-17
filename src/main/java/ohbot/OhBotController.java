@@ -1262,7 +1262,7 @@ public class OhBotController {
     }
 
     private void help(String text, String replyToken) throws IOException {
-        String imageUrl = "";
+        String imageUrl = "https://www.facebook.com/images/fb_icon_325x325.png";
         ButtonsTemplate buttonsTemplate = new ButtonsTemplate(imageUrl,"安安你好","",
                 Arrays.asList(
                         new MessageAction("查個股股價","輸入 @2331? 或 @台積電?"),

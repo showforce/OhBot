@@ -11,12 +11,12 @@ import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.event.source.GroupSource;
-import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.template.ButtonsTemplate;
+import com.linecorp.bot.model.message.template.CarouselColumn;
+import com.linecorp.bot.model.message.template.CarouselTemplate;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
@@ -447,6 +447,9 @@ public class OhBotController {
 
         if (text.endsWith("@?") || text.endsWith("@？")) {
             help(text, replyToken);
+        }
+        if (text.endsWith("#?") || text.endsWith("＃？")) {
+            help2(text, replyToken);
         }
     }
 
@@ -1262,6 +1265,30 @@ public class OhBotController {
                 )
         );
         TemplateMessage templateMessage = new TemplateMessage("The function Only on mobile device ! ", buttonsTemplate);
+        this.reply(replyToken, templateMessage);
+    }
+
+    private void help2(String text, String replyToken) throws IOException {
+        String imageUrl = "https://p1.bqimg.com/524586/f7f88ef91547655cs.png";
+        CarouselTemplate carouselTemplate = new CarouselTemplate(
+                Arrays.asList(
+                        new CarouselColumn(imageUrl, "安安你好", "",
+                                           Arrays.asList(
+                                                   new MessageAction("查個股股價", "查個股股價 輸入 @2331? 或 @台積電?"),
+                                                   new MessageAction("查加權上櫃指數", "查加權上櫃指數 輸入 呆股?"),
+                                                   new MessageAction("查匯率", "查匯率 輸入 美金匯率? 或 匯率? 檢視可查匯率")
+                                           )
+                        ),
+                        new CarouselColumn(imageUrl, "安安你好", "",
+                                           Arrays.asList(
+                                                   new MessageAction("查天氣", "查天氣　輸入 台北市天氣?"),
+                                                   new MessageAction("查氣象", "查氣象　輸入 台北市氣象?"),
+                                                   new MessageAction("查空氣品質", "查空氣品質　輸入 北部空氣?")
+                                           )
+                        )
+                )
+        );
+        TemplateMessage templateMessage = new TemplateMessage("The function Only on mobile device ! ", carouselTemplate);
         this.reply(replyToken, templateMessage);
     }
 }

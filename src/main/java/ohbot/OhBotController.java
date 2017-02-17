@@ -5,11 +5,18 @@ import com.google.gson.GsonBuilder;
 import com.linecorp.bot.client.LineMessagingService;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.action.MessageAction;
+import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.event.source.GroupSource;
+import com.linecorp.bot.model.event.source.Source;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.template.ButtonsTemplate;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
@@ -440,6 +447,31 @@ public class OhBotController {
 
         if (text.endsWith("@?") || text.endsWith("@？")) {
             help(text, replyToken);
+        }
+    }
+
+    @EventMapping
+    public void handlePostbackEvent(PostbackEvent event) throws IOException {
+        log.info("Got postBack event: {}", event);
+        String replyToken = event.getReplyToken();
+        String data = event.getPostbackContent().getData();
+        Source source = event.getSource();
+        switch (data) {
+            case "bye:yes": {
+                this.replyText(replyToken, "Bye, see you again ...");
+                lineMessagingService.leaveGroup(
+                        ((GroupSource) source).getGroupId()
+                ).execute();
+                break;
+            }
+
+            case "bye:no": {
+                this.replyText(replyToken, "Ok, let us keep talking!");
+                break;
+            }
+
+            default:
+                this.replyText(replyToken, "Got postback event : " + event.getPostbackContent().getData());
         }
     }
 
@@ -1229,9 +1261,16 @@ public class OhBotController {
     }
 
     private void help(String text, String replyToken) throws IOException {
-        String strResult = "";
-        strResult = "@2330? \n @台積電? \n  \n  ";
-        String result = EmojiUtils.emojify(strResult);
-        this.replyText(replyToken, result);
+        String imageUrl = "";
+        ButtonsTemplate buttonsTemplate = new ButtonsTemplate(imageUrl,"安安你好","",
+                Arrays.asList(
+                        new MessageAction("查個股股價","輸入 @2331? 或 @台積電?"),
+                        new MessageAction("查加權上櫃指數","輸入 呆股?"),
+                        new MessageAction("查匯率","輸入 美金匯率?"),
+                        new PostbackAction("更多","")
+                )
+        );
+        TemplateMessage templateMessage = new TemplateMessage("Sorry, Unsupport the function in your platform. ", buttonsTemplate);
+        this.reply(replyToken, templateMessage);
     }
 }

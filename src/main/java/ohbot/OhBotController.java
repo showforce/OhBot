@@ -437,7 +437,7 @@ public class OhBotController {
             aqiResult(text, replyToken);
         }
 
-        if (text.startsWith("匯率?") || text.startsWith("匯率？")) {
+        if (text.endsWith("匯率?") || text.endsWith("匯率？")) {
             rate(text, replyToken);
         }
 

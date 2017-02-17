@@ -42,6 +42,7 @@ public class MsgArray {
     private String i;
     //跌停價
     private String w;
+    //累積成交量
     private String v;
     //漲停價
     private String u;

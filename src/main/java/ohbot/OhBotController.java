@@ -996,7 +996,8 @@ public class OhBotController {
                     }
                 }
                 //開盤 : "+msgArray.getO()+"\n昨收 : "+msgArray.getY()+"
-                strResult = msgArray.getC()+" "+ msgArray.getN()+" "+change+range+" \n現價 : "+msgArray.getZ()+"\n更新 : "+msgArray.getT();
+                strResult =msgArray.getC() + " " + msgArray.getN() + " " + change + range + " \n現價 : " + msgArray.getZ() +
+                        " \n成量 : " + msgArray.getV() + "\n更新 : " + msgArray.getT();
             }
             this.replyText(replyToken, strResult);
         } catch (IOException e) {

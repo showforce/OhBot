@@ -497,7 +497,7 @@ public class OhBotController {
         text = text.replace("天氣", "").replace("?", "").replace("？", "").replace("臺", "台").trim();
         log.info(text);
         try {
-            if (text.length() >= 3) {
+            if (text.length() <= 3) {
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 String strResult;
                 switch (text) {
@@ -657,7 +657,7 @@ public class OhBotController {
         text = text.replace("氣象", "").replace("?", "").replace("？", "").replace("臺", "台").trim();
         log.info(text);
         try {
-            if (text.length() >= 3) {
+            if (text.length() <= 3) {
                 String strResult;
                 String url ="";
                 switch (text) {

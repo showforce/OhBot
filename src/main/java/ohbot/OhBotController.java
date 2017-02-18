@@ -7,6 +7,7 @@ import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
+import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
@@ -1272,25 +1273,25 @@ public class OhBotController {
         String imageUrl = "https://p1.bqimg.com/524586/f7f88ef91547655cs.png";
         CarouselTemplate carouselTemplate = new CarouselTemplate(
                 Arrays.asList(
-                        new CarouselColumn(imageUrl, "安安", "吳榮峻請勿幼稚",
+                        new CarouselColumn(imageUrl, "安安", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查個股股價", "查個股股價 輸入 @2331? 或 @台積電?"),
                                                    new MessageAction("查加權上櫃指數", "查加權上櫃指數 輸入 呆股?"),
                                                    new MessageAction("查匯率", "查匯率 輸入 美金匯率? 或 匯率? 檢視可查匯率")
                                            )
                         ),
-                        new CarouselColumn(imageUrl, "安安", "吳榮峻請勿幼稚",
+                        new CarouselColumn(imageUrl, "安安", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查天氣", "查天氣　輸入 台北市天氣?"),
                                                    new MessageAction("查氣象", "查氣象　輸入 台北市氣象?"),
                                                    new MessageAction("查空氣品質", "查空氣品質　輸入 北部空氣?")
                                            )
                         ),
-                        new CarouselColumn(imageUrl, "安安", "吳榮峻請勿幼稚",
+                        new CarouselColumn(imageUrl, "安安", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查油價", "查天氣　輸入 油價?"),
                                                    new MessageAction("查星座", "查氣象　輸入 牡羊座?"),
-                                                   new MessageAction("查星座", "查氣象　輸入 天蠍座?")
+                                                   new URIAction("手機.新辦移轉續約.快速維修.中古買賣","https://www.facebook.com/aimobile01/")
                                            )
                         )
                 )

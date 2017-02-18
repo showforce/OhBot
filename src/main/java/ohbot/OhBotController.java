@@ -1272,14 +1272,14 @@ public class OhBotController {
         String imageUrl = "https://p1.bqimg.com/524586/f7f88ef91547655cs.png";
         CarouselTemplate carouselTemplate = new CarouselTemplate(
                 Arrays.asList(
-                        new CarouselColumn(imageUrl, "安安你好", "",
+                        new CarouselColumn(imageUrl, "安安你好", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查個股股價", "查個股股價 輸入 @2331? 或 @台積電?"),
                                                    new MessageAction("查加權上櫃指數", "查加權上櫃指數 輸入 呆股?"),
                                                    new MessageAction("查匯率", "查匯率 輸入 美金匯率? 或 匯率? 檢視可查匯率")
                                            )
                         ),
-                        new CarouselColumn(imageUrl, "安安你好", "",
+                        new CarouselColumn(imageUrl, "安安你好", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查天氣", "查天氣　輸入 台北市天氣?"),
                                                    new MessageAction("查氣象", "查氣象　輸入 台北市氣象?"),

@@ -1289,6 +1289,7 @@ public class OhBotController {
                         new CarouselColumn(imageUrl, "安安", "吳榮峻請勿幼稚",
                                            Arrays.asList(
                                                    new MessageAction("查油價", "查天氣　輸入 油價?"),
+                                                   new MessageAction("查星座", "查氣象　輸入 牡羊座?"),
                                                    new MessageAction("查星座", "查氣象　輸入 天蠍座?")
                                            )
                         )

@@ -449,9 +449,9 @@ public class OhBotController {
         if (text.endsWith("@?") || text.endsWith("@？")) {
             help2(text, replyToken);
         }
-//        if (text.endsWith("#?") || text.endsWith("＃？")) {
-//            help2(text, replyToken);
-//        }
+        if (text.endsWith("#?") || text.endsWith("＃？")) {
+            help(text, replyToken);
+        }
     }
 
     @EventMapping

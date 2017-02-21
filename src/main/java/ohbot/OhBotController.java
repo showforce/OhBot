@@ -18,6 +18,7 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.template.ButtonsTemplate;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
+import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
@@ -401,6 +402,13 @@ public class OhBotController {
         return strResult;
     }
 
+    @RequestMapping("/user")
+    public String user(@RequestParam(value = "userid") String userid) throws IOException {
+        String strResult="";
+        UserProfileResponse userProfileResponse = getUserProfile(userid);
+        strResult = userProfileResponse.getDisplayName() + "\n" + userProfileResponse.getPictureUrl();
+        return strResult;
+    }
 
     @EventMapping
     public void handleDefaultMessageEvent(Event event) {
@@ -492,6 +500,13 @@ public class OhBotController {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    private UserProfileResponse getUserProfile(@NonNull String userId) throws IOException {
+        Response<UserProfileResponse> response = lineMessagingService
+                .getProfile(userId)
+                .execute();
+        return response.body();
     }
 
     private void weatherResult(String text, String replyToken) throws IOException {
@@ -1239,7 +1254,7 @@ public class OhBotController {
                             tseStock.getTSE_D() + EmojiUtils.emojify(":chart_with_downwards_trend:") + tseStock.getTSE_P() +
                             "% \n成交金額(億) : " + tseStock.getTSE_V() + "\n";
             }
-            if (tseStock.getOTC_I() > 0) {
+            if (tseStock.getOTC_D() > 0) {
                 strResult = strResult + "櫃買 : " + tseStock.getOTC_I() + EmojiUtils.emojify(":chart_with_upwards_trend:") +
                             tseStock.getOTC_D() + EmojiUtils.emojify(":chart_with_upwards_trend:") + tseStock.getOTC_P() +
                             "% \n成交金額(億) : " + tseStock.getOTC_V() + "\n";

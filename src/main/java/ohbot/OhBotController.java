@@ -1306,7 +1306,7 @@ public class OhBotController {
                                            Arrays.asList(
                                                    new MessageAction("查油價", "查天氣　輸入 油價?"),
                                                    new MessageAction("查星座", "查氣象　輸入 牡羊座?"),
-                                                   new URIAction("手機.新辦移轉續約.快速維修.中古買賣","https://www.facebook.com/aimobile01/")
+                                                   new MessageAction("查星座", "查氣象　輸入 牡羊座?")
                                            )
                         )
                 )

@@ -1328,19 +1328,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             Gson gson = new GsonBuilder().create();
             Screener screener = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"),Screener.class);
 
-            Item item = screener.getItems().get(0);
-            strResult = "◎" + stockNmae + " " + text + "\n";
-            strResult = strResult + "收盤："+item.getVFLD_CLOSE() + " 漲跌：" + item.getVFLD_UP_DN() + " 漲跌幅：" + item.getVFLD_UP_DN_RATE() + "\n";
-            strResult = strResult + "近52周  最高："+item.getV52_WEEK_HIGH_PRICE()+" 最低："+item.getV52_WEEK_LOW_PRICE() + "\n";
-            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收："+item.getVGET_MONEY() + "\n";
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率："+item.getVFLD_PROFIT() + "\n";
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS)："+item.getVFLD_EPS() + "\n";
-            strResult = strResult + "本益比(PER)："+item.getVFLD_PER() + "\n";
-            strResult = strResult + "每股淨值(PBR)："+item.getVFLD_PBR() + "\n";
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE)："+item.getVFLD_ROE() + "\n";
-            strResult = strResult + "K9值："+item.getVFLD_K9_UPDNRATE() + "\n";
-            strResult = strResult + "D9值："+item.getVFLD_D9_UPDNRATE() + "\n";
-            strResult = strResult + "MACD："+item.getVMACD() + "\n";
+
 
 
             url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
@@ -1378,7 +1366,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             String strContent = stringBuilder.toString();
 
             //切掉不要區塊
-            if (strResult.contains("<tbody>")) {
+            if (strContent.contains("<tbody>")) {
                 strContent = strContent.substring(strContent.indexOf("<tbody>"), strContent.length());
             }
 
@@ -1394,12 +1382,12 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
 
             //除權息
-            String XDInfo = "\n";
+            String XDInfo = "";
             if(strContent.contains("近1年殖利率")){
                 XDInfo = strContent.substring(strContent.indexOf("除"), strContent.indexOf("近1年殖利率"));
                 strContent = strContent.replace(XDInfo, "");
             }
-            XDInfo = XDInfo.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "");
+            XDInfo = "\n" + XDInfo.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "");
 
             //殖利率
             String yield = "\n";
@@ -1413,12 +1401,26 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","").replace("為銀行","");
 
             //均線
-            String movingAVG = "\n"+strContent.replace("看懂財報","").replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
+            String movingAVG = "\n"+strContent.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
 
-            strResult = strResult + basicAssessment;
+
+            Item item = screener.getItems().get(0);
+            strResult = "◎" + stockNmae + " " + text + "\n";
+            strResult = strResult + "收盤："+item.getVFLD_CLOSE() + " 漲跌：" + item.getVFLD_UP_DN() + " 漲跌幅：" + item.getVFLD_UP_DN_RATE() + "\n";
+            strResult = strResult + "近52周  最高："+item.getV52_WEEK_HIGH_PRICE()+" 最低："+item.getV52_WEEK_LOW_PRICE() + "\n";
+            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收："+item.getVGET_MONEY() + "\n";
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率："+item.getVFLD_PROFIT() + "\n";
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS)："+item.getVFLD_EPS() + "\n";
+            strResult = strResult + "本益比(PER)："+item.getVFLD_PER() + "\n";
+            strResult = strResult + "每股淨值(PBR)："+item.getVFLD_PBR() + "\n";
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE)："+item.getVFLD_ROE() + "\n";
+            strResult = strResult + "K9值："+item.getVFLD_K9_UPDNRATE() + "\n";
+            strResult = strResult + "D9值："+item.getVFLD_D9_UPDNRATE() + "\n";
+            strResult = strResult + "MACD："+item.getVMACD() + "\n";
+            strResult = strResult + movingAVG;
             strResult = strResult + XDInfo;
             strResult = strResult + yield;
-            strResult = strResult + movingAVG;
+            strResult = strResult + basicAssessment;
             //this.replyText(replyToken, EmojiUtils.emojify(strResult));
             this.replyText(replyToken, strResult);
         } catch (Exception e) {

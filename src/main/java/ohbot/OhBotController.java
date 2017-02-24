@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import ohbot.aqiObj.AqiResult;
 import ohbot.aqiObj.Datum;
 import ohbot.stockObj.*;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -325,8 +326,13 @@ public class OhBotController {
                 response = defaultHttpClient.execute(httpget);
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
                 httpEntity = response.getEntity();
+                Header[] ss = response.getAllHeaders();
+                for(Header header:ss){
+                    if(header.getName().contains("Content-Encoding"))
+                    System.out.println(header.getName()+" "+header.getValue());
+                }
                 InputStream inputStream = httpEntity.getContent();
-                //inputStream = new GZIPInputStream(inputStream);
+                inputStream = new GZIPInputStream(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
                 String newLine;
                 StringBuilder stringBuilder = new StringBuilder();
@@ -1339,7 +1345,15 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             log.info(String.valueOf(response.getStatusLine().getStatusCode()));
             httpEntity = response.getEntity();
             InputStream inputStream = httpEntity.getContent();
-            inputStream = new GZIPInputStream(inputStream);
+            Header[] ss = response.getAllHeaders();
+            for(Header header:ss){
+                if(header.getName().contains("Content-Encoding")){
+                    System.out.println(header.getName()+" "+header.getValue());
+                    if(header.getValue().contains("gzip")){
+                        inputStream = new GZIPInputStream(inputStream);
+                    }
+                }
+            }
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
             String newLine;
             StringBuilder stringBuilder = new StringBuilder();

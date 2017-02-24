@@ -1379,7 +1379,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
 
             //切掉不要區塊
             if (strResult.contains("<tbody>")) {
-                strContent = strContent.substring(strContent.indexOf("<tbody>"),strContent.length()).replace("看懂財報","");
+                strContent = strContent.substring(strContent.indexOf("<tbody>"), strContent.length());
             }
 
             //基本評估
@@ -1394,7 +1394,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
 
             //除權息
-            String XDInfo = "";
+            String XDInfo = "\n";
             if(strContent.contains("近1年殖利率")){
                 XDInfo = strContent.substring(strContent.indexOf("除"), strContent.indexOf("近1年殖利率"));
                 strContent = strContent.replace(XDInfo, "");
@@ -1402,7 +1402,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             XDInfo = XDInfo.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "");
 
             //殖利率
-            String yield = "";
+            String yield = "\n";
             pattern = Pattern.compile("近.*?</td>.*?</td>");
             matcher = pattern.matcher(strContent);
             while (matcher.find()) {
@@ -1410,10 +1410,10 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                 yield = yield + s;
                 strContent = strContent.replace(s,"");
             }
-            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","").replace("約為銀行","");
+            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","").replace("為銀行","");
 
             //均線
-            String movingAVG = "\n"+strContent.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
+            String movingAVG = "\n"+strContent.replace("看懂財報","").replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
 
             strResult = strResult + basicAssessment;
             strResult = strResult + XDInfo;

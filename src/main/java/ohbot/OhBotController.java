@@ -326,7 +326,7 @@ public class OhBotController {
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
                 httpEntity = response.getEntity();
                 InputStream inputStream = httpEntity.getContent();
-                inputStream = new GZIPInputStream(inputStream);
+                //inputStream = new GZIPInputStream(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
                 String newLine;
                 StringBuilder stringBuilder = new StringBuilder();

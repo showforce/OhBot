@@ -1379,7 +1379,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
 
             //切掉不要區塊
             if (strResult.contains("<tbody>")) {
-                strContent = strContent.substring(strContent.indexOf("<tbody>"),strContent.length());
+                strContent = strContent.substring(strContent.indexOf("<tbody>"),strContent.length()).replace("看懂財報","");
             }
 
             //基本評估
@@ -1391,7 +1391,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                 basicAssessment = basicAssessment + s;
                 strContent = strContent.replace(s,"");
             }
-            basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "");
+            basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
 
             //除權息
             String XDInfo = "";
@@ -1399,7 +1399,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                 XDInfo = strContent.substring(strContent.indexOf("除"), strContent.indexOf("近1年殖利率"));
                 strContent = strContent.replace(XDInfo, "");
             }
-            XDInfo = XDInfo.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "");
+            XDInfo = XDInfo.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "");
 
             //殖利率
             String yield = "";
@@ -1410,7 +1410,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                 yield = yield + s;
                 strContent = strContent.replace(s,"");
             }
-            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","");
+            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","").replace("約為銀行","");
 
             //均線
             String movingAVG = "\n"+strContent.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");

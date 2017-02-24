@@ -1330,16 +1330,16 @@ This code is public domain: you are free to use, link and/or modify it in any wa
 
             Item item = screener.getItems().get(0);
             strResult = "◎" + stockNmae + " " + text + "\n";
-            strResult = strResult + "收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE() + "\n";;
-            strResult = strResult + "近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE() + "\n";;
-            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY() + "\n";;
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT() + "\n";;
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS() + "\n";;
-            strResult = strResult + "本益比(PER) :"+item.getVFLD_PER() + "\n";;
-            strResult = strResult + "每股淨值(PBR) :"+item.getVFLD_PBR() + "\n";;
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE() + "\n";;
-            strResult = strResult + "K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE() + "\n";;
-            strResult = strResult + "MACD :"+item.getVMACD() + "\n";;
+            strResult = strResult + "收盤："+item.getVFLD_CLOSE() + " 漲跌：" + item.getVFLD_UP_DN() + " 漲跌幅：" + item.getVFLD_UP_DN_RATE() + "\n";
+            strResult = strResult + "近52周  最高："+item.getV52_WEEK_HIGH_PRICE()+" 最低："+item.getV52_WEEK_LOW_PRICE() + "\n";
+            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收："+item.getVGET_MONEY() + "\n";
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率："+item.getVFLD_PROFIT() + "\n";
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS)："+item.getVFLD_EPS() + "\n";
+            strResult = strResult + "本益比(PER)："+item.getVFLD_PER() + "\n";
+            strResult = strResult + "每股淨值(PBR)："+item.getVFLD_PBR() + "\n";
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE)："+item.getVFLD_ROE() + "\n";
+            strResult = strResult + "K9值："+item.getVFLD_K9_UPDNRATE()+"D9值："+item.getVFLD_D9_UPDNRATE() + "\n";
+            strResult = strResult + "MACD："+item.getVMACD() + "\n";
 
 
             url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
@@ -1395,7 +1395,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             //除權息
             String XDInfo = "";
             if(strContent.contains("近1年殖利率")){
-                XDInfo = strContent.substring(0, strContent.indexOf("近1年殖利率"));
+                XDInfo = strContent.substring(strContent.indexOf("近"), strContent.indexOf("近1年殖利率"));
                 strContent = strContent.replace(XDInfo, "");
             }
             XDInfo = XDInfo.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "");

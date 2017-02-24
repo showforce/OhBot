@@ -1269,7 +1269,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
 
     private void stockMore(String text, String replyToken) {
         try {
-            text = text.replace("@","").replace("?", "").replace("？","");
+            text = text.replace("@","").replace("?", "").replace("？","").replace("#","");
             String[] otcs = StockList.otcList;
             HashMap<String, String> otcNoMap = new HashMap<>();
             HashMap<String, String> otcNameMap = new HashMap<>();
@@ -1325,9 +1325,23 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             log.info(String.valueOf(response.getStatusLine().getStatusCode()));
             HttpEntity httpEntity = response.getEntity();
             String strResult = "";
-
             Gson gson = new GsonBuilder().create();
             Screener screener = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"),Screener.class);
+
+            Item item = screener.getItems().get(0);
+            strResult = "◎" + stockNmae + " " + text;
+            strResult = strResult + "收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE();
+            strResult = strResult + "近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE();
+            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY();
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT();
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS();
+            strResult = strResult + "本益比(PER) :"+item.getVFLD_PER();
+            strResult = strResult + "每股淨值(PBR) :"+item.getVFLD_PBR();
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE();
+            strResult = strResult + "K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE();
+            strResult = strResult + "MACD :"+item.getVMACD();
+
+
             url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
             httpget = new HttpGet(url);
             log.info(url);
@@ -1360,60 +1374,46 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             while ((newLine = bufferedReader.readLine()) != null) {
                 stringBuilder.append(newLine);
             }
-            strResult = stringBuilder.toString();
+            String strContent = stringBuilder.toString();
 
             //切掉不要區塊
             if (strResult.contains("<tbody>")) {
-                strResult = strResult.substring(strResult.indexOf("<tbody>"),strResult.length());
+                strContent = strContent.substring(strContent.indexOf("<tbody>"),strContent.length());
             }
 
             //基本評估
             String basicAssessment="\n";
             pattern = Pattern.compile("<strong>.*?</strong>.*?</td>");
-            matcher = pattern.matcher(strResult);
+            matcher = pattern.matcher(strContent);
             while (matcher.find()) {
                 String s = matcher.group();
                 basicAssessment = basicAssessment + s;
-                strResult = strResult.replace(s,"");
+                strContent = strContent.replace(s,"");
             }
             basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "");
 
             //除權息
             String XDInfo = "";
-            if(strResult.contains("近1年殖利率")){
-                XDInfo = strResult.substring(0, strResult.indexOf("近1年殖利率"));
-                strResult = strResult.replace(XDInfo, "");
+            if(strContent.contains("近1年殖利率")){
+                XDInfo = strContent.substring(0, strContent.indexOf("近1年殖利率"));
+                strContent = strContent.replace(XDInfo, "");
             }
             XDInfo = XDInfo.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "");
 
             //殖利率
             String yield = "";
             pattern = Pattern.compile("近.*?</td>.*?</td>");
-            matcher = pattern.matcher(strResult);
+            matcher = pattern.matcher(strContent);
             while (matcher.find()) {
                 String s = matcher.group();
                 yield = yield + s;
-                strResult = strResult.replace(s,"");
+                strContent = strContent.replace(s,"");
             }
             yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","");
 
             //均線
-            String movingAVG = "\n"+strResult.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
+            String movingAVG = "\n"+strContent.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
 
-            strResult = "";
-
-            Item item = screener.getItems().get(0);
-            strResult = "◎" + stockNmae + " " + text;
-            strResult = strResult + "收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE();
-            strResult = strResult + "近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE();
-            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY();
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT();
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS();
-            strResult = strResult + "本益比(PER) :"+item.getVFLD_PER();
-            strResult = strResult + "每股淨值(PBR) :"+item.getVFLD_PBR();
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE();
-            strResult = strResult + "K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE();
-            strResult = strResult + "MACD :"+item.getVMACD();
             strResult = strResult + basicAssessment;
             strResult = strResult + XDInfo;
             strResult = strResult + yield;

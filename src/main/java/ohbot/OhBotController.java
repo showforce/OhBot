@@ -7,7 +7,6 @@ import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
-import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
@@ -27,14 +26,17 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import ohbot.aqiObj.AqiResult;
 import ohbot.aqiObj.Datum;
-import ohbot.stockObj.MsgArray;
-import ohbot.stockObj.StockData;
-import ohbot.stockObj.StockList;
-import ohbot.stockObj.TseStock;
+import ohbot.stockObj.*;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +45,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import retrofit2.Response;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import javax.net.ssl.*;
+import java.io.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by lambertyang on 2017/1/13.
@@ -234,6 +239,156 @@ public class OhBotController {
                     //開盤 : "+msgArray.getO()+"\n昨收 : "+msgArray.getY()+"
                     strResult = msgArray.getC()+" "+ msgArray.getN()+" "+change+range+" \n現價 : "+msgArray.getZ()+"\n更新 : "+msgArray.getT();
                 }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return strResult;
+    }
+
+    @RequestMapping("/stock2")
+    public String stock2(@RequestParam(value = "stock") String stock) {
+        String strResult = "";
+        try {
+            if (stock != null) {
+                String[] otcs = StockList.otcList;
+                HashMap<String, String> otcNoMap = new HashMap<>();
+                HashMap<String, String> otcNameMap = new HashMap<>();
+                for (String otc : otcs) {
+                    String[] s = otc.split("=");
+                    otcNoMap.put(s[0], s[1]);
+                    otcNameMap.put(s[1], s[0]);
+                }
+
+                String[] tses = StockList.tseList;
+                HashMap<String, String> tseNoMap = new HashMap<>();
+                HashMap<String, String> tseNameMap = new HashMap<>();
+                for (String tse : tses) {
+                    String[] s = tse.split("=");
+                    tseNoMap.put(s[0], s[1]);
+                    tseNameMap.put(s[1], s[0]);
+                }
+
+                System.out.println(stock);
+                Pattern pattern = Pattern.compile("[\\d]{3,}");
+                Matcher matcher = pattern.matcher(stock);
+                String stockNmae="";
+                if (matcher.find()) {
+                    if (otcNoMap.get(stock) != null) {
+                        stockNmae = otcNoMap.get(stock);
+                    } else {
+                        stockNmae = tseNoMap.get(stock);
+                    }
+                } else {
+                    if (otcNameMap.get(stock) != null) {
+                        stockNmae = stock;
+                        stock = otcNameMap.get(stock);
+                    } else {
+                        stockNmae = stock;
+                        stock = tseNameMap.get(stock);
+                    }
+                }
+
+                DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
+                defaultHttpClient = (DefaultHttpClient) WebClientDevWrapper.wrapClient(defaultHttpClient);
+                String url="https://tw.screener.finance.yahoo.net/screener/ws?f=j&ShowID="+stock;
+                log.info(url);
+                HttpGet httpget = new HttpGet(url);
+                httpget.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
+                httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+                httpget.setHeader("Cache-Control", "max-age=0");
+                httpget.setHeader("Connection", "keep-alive");
+                httpget.setHeader("Upgrade-Insecure-Requests", "1");
+                httpget.setHeader("User-Agent",
+                                  "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+                CloseableHttpResponse response = defaultHttpClient.execute(httpget);
+                log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+                HttpEntity httpEntity = response.getEntity();
+                strResult = "";
+
+                Gson gson = new GsonBuilder().create();
+                Screener screener = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"),Screener.class);
+                url="https://news.money-link.com.tw/yahoo/0061_"+stock+".html";
+                httpget = new HttpGet(url);
+                log.info(url);
+                httpget.setHeader("Accept",
+                                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+                httpget.setHeader("Accept-Encoding","gzip, deflate, sdch, br");
+                httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+                httpget.setHeader("Cache-Control", "max-age=0");
+                httpget.setHeader("Connection", "keep-alive");
+                httpget.setHeader("Host", "news.money-link.com.tw");
+                httpget.setHeader("Upgrade-Insecure-Requests", "1");
+                httpget.setHeader("User-Agent",
+                                  "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+                response = defaultHttpClient.execute(httpget);
+                log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+                httpEntity = response.getEntity();
+                InputStream inputStream = httpEntity.getContent();
+                inputStream = new GZIPInputStream(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+                String newLine;
+                StringBuilder stringBuilder = new StringBuilder();
+                while ((newLine = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(newLine);
+                }
+                strResult = stringBuilder.toString();
+
+                //切掉不要區塊
+                if (strResult.contains("<tbody>")) {
+                    strResult = strResult.substring(strResult.indexOf("<tbody>"),strResult.length());
+                }
+
+                //基本評估
+                String basicAssessment="\n";
+                pattern = Pattern.compile("<strong>.*?</strong>.*?</td>");
+                matcher = pattern.matcher(strResult);
+                while (matcher.find()) {
+                    String s = matcher.group();
+                    basicAssessment = basicAssessment + s;
+                    strResult = strResult.replace(s,"");
+                }
+                basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "");
+
+                //除權息
+                String XDInfo = "";
+                if(strResult.contains("近1年殖利率")){
+                    XDInfo = strResult.substring(0, strResult.indexOf("近1年殖利率"));
+                    strResult=strResult.replace(XDInfo,"");
+                }
+                XDInfo = XDInfo.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "");
+
+                //殖利率
+                String yield = "";
+                pattern = Pattern.compile("近.*?</td>.*?</td>");
+                matcher = pattern.matcher(strResult);
+                while (matcher.find()) {
+                    String s = matcher.group();
+                    yield = yield + s;
+                    strResult = strResult.replace(s,"");
+                }
+                yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","");
+
+                //均線
+                String movingAVG = "\n"+strResult.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
+
+                Item item = screener.getItems().get(0);
+                System.out.println(stockNmae + " " + stock);
+                System.out.println("收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE());
+                System.out.println("近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE());
+                System.out.println(item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY());
+                System.out.println(item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT());
+                System.out.println(item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS());
+                System.out.println("本益比(PER) :"+item.getVFLD_PER());
+                System.out.println("每股淨值(PBR) :"+item.getVFLD_PBR());
+                System.out.println(item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE());
+                System.out.println("K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE());
+                System.out.println("MACD :"+item.getVMACD());
+                System.out.println(basicAssessment);
+                System.out.println(XDInfo);
+                System.out.println(yield);
+                System.out.println(movingAVG);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -432,14 +587,20 @@ public class OhBotController {
         }
 
         if (text.endsWith("座?") || text.endsWith("座？")) {
-            start(text, replyToken);
+            star(text, replyToken);
         }
         if (text.endsWith("油價?") || text.endsWith("油價？")) {
             taiwanoil(text, replyToken);
         }
 
-        if ((text.startsWith("@") && text.endsWith("?")) || (text.startsWith("@") && text.endsWith("？"))) {
+        if ((text.startsWith("@") && text.endsWith("?")) || (text.startsWith("@") && text.endsWith("？")) ||
+            (text.startsWith("＠") && text.endsWith("？")) || (text.startsWith("＠") && text.endsWith("?"))) {
             stock(text, replyToken);
+        }
+
+        if ((text.startsWith("#") && text.endsWith("?")) || (text.startsWith("#") && text.endsWith("？")) ||
+            (text.startsWith("＃") && text.endsWith("？")) || (text.startsWith("＃") && text.endsWith("?"))) {
+            stockMore(text, replyToken);
         }
 
         if (text.endsWith("空氣?") || text.endsWith("空氣？")) {
@@ -507,6 +668,59 @@ public class OhBotController {
                 .getProfile(userId)
                 .execute();
         return response.body();
+    }
+
+/*
+This code is public domain: you are free to use, link and/or modify it in any way you want, for all purposes including commercial applications.
+*/
+    public static class WebClientDevWrapper {
+
+        public static HttpClient wrapClient(HttpClient base) {
+            try {
+                SSLContext ctx = SSLContext.getInstance("TLS");
+                X509TrustManager tm = new X509TrustManager() {
+
+                    public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
+                    }
+
+                    public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
+                    }
+
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                };
+                X509HostnameVerifier verifier = new X509HostnameVerifier() {
+
+                    @Override
+                    public void verify(String string, SSLSocket ssls) throws IOException {
+                    }
+
+                    @Override
+                    public void verify(String string, X509Certificate xc) throws SSLException {
+                    }
+
+                    @Override
+                    public void verify(String string, String[] strings, String[] strings1) throws SSLException {
+                    }
+
+                    @Override
+                    public boolean verify(String string, SSLSession ssls) {
+                        return true;
+                    }
+                };
+                ctx.init(null, new TrustManager[]{tm}, null);
+                org.apache.http.conn.ssl.SSLSocketFactory ssf = new org.apache.http.conn.ssl.SSLSocketFactory(ctx);
+                ssf.setHostnameVerifier(verifier);
+                ClientConnectionManager ccm = base.getConnectionManager();
+                SchemeRegistry sr = ccm.getSchemeRegistry();
+                sr.register(new Scheme("https", ssf, 443));
+                return new DefaultHttpClient(ccm, base.getParams());
+            } catch (Exception ex) {
+                log.error("Error in wrapClient : " + ex.toString());
+                return null;
+            }
+        }
     }
 
     private void weatherResult(String text, String replyToken) throws IOException {
@@ -846,7 +1060,7 @@ public class OhBotController {
         }
     }
 
-    private void start(String text, String replyToken) throws IOException {
+    private void star(String text, String replyToken) throws IOException {
         text = text.replace("座", "").replace("?", "").replace("？", "").trim();
         log.info(text);
         try {
@@ -1043,6 +1257,156 @@ public class OhBotController {
             }
             this.replyText(replyToken, strResult);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stockMore(String text, String replyToken) {
+        try {
+            text = text.replace("@","").replace("?", "").replace("？","");
+            String[] otcs = StockList.otcList;
+            HashMap<String, String> otcNoMap = new HashMap<>();
+            HashMap<String, String> otcNameMap = new HashMap<>();
+            for (String otc : otcs) {
+                String[] s = otc.split("=");
+                otcNoMap.put(s[0], s[1]);
+                otcNameMap.put(s[1], s[0]);
+            }
+
+            String[] tses = StockList.tseList;
+            HashMap<String, String> tseNoMap = new HashMap<>();
+            HashMap<String, String> tseNameMap = new HashMap<>();
+            for (String tse : tses) {
+                String[] s = tse.split("=");
+                tseNoMap.put(s[0], s[1]);
+                tseNameMap.put(s[1], s[0]);
+            }
+
+            System.out.println(text);
+            Pattern pattern = Pattern.compile("[\\d]{3,}");
+            Matcher matcher = pattern.matcher(text);
+            String stockNmae="";
+            if (matcher.find()) {
+                if (otcNoMap.get(text) != null) {
+                    stockNmae = otcNoMap.get(text);
+                } else {
+                    stockNmae = tseNoMap.get(text);
+                }
+            } else {
+                if (otcNameMap.get(text) != null) {
+                    stockNmae = text;
+                    text = otcNameMap.get(text);
+                } else {
+                    stockNmae = text;
+                    text = tseNameMap.get(text);
+                }
+            }
+
+            DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
+            defaultHttpClient = (DefaultHttpClient) WebClientDevWrapper.wrapClient(defaultHttpClient);
+            String url="https://tw.screener.finance.yahoo.net/screener/ws?f=j&ShowID="+text;
+            log.info(url);
+            HttpGet httpget = new HttpGet(url);
+            httpget.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
+            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+            httpget.setHeader("Cache-Control", "max-age=0");
+            httpget.setHeader("Connection", "keep-alive");
+            httpget.setHeader("Upgrade-Insecure-Requests", "1");
+            httpget.setHeader("User-Agent",
+                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+            CloseableHttpResponse response = defaultHttpClient.execute(httpget);
+            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+            HttpEntity httpEntity = response.getEntity();
+            String strResult = "";
+
+            Gson gson = new GsonBuilder().create();
+            Screener screener = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"),Screener.class);
+            url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
+            httpget = new HttpGet(url);
+            log.info(url);
+            httpget.setHeader("Accept",
+                              "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            httpget.setHeader("Accept-Encoding","gzip, deflate, sdch, br");
+            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+            httpget.setHeader("Cache-Control", "max-age=0");
+            httpget.setHeader("Connection", "keep-alive");
+            httpget.setHeader("Host", "news.money-link.com.tw");
+            httpget.setHeader("Upgrade-Insecure-Requests", "1");
+            httpget.setHeader("User-Agent",
+                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+            response = defaultHttpClient.execute(httpget);
+            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+            httpEntity = response.getEntity();
+            InputStream inputStream = httpEntity.getContent();
+            inputStream = new GZIPInputStream(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+            String newLine;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((newLine = bufferedReader.readLine()) != null) {
+                stringBuilder.append(newLine);
+            }
+            strResult = stringBuilder.toString();
+
+            //切掉不要區塊
+            if (strResult.contains("<tbody>")) {
+                strResult = strResult.substring(strResult.indexOf("<tbody>"),strResult.length());
+            }
+
+            //基本評估
+            String basicAssessment="\n";
+            pattern = Pattern.compile("<strong>.*?</strong>.*?</td>");
+            matcher = pattern.matcher(strResult);
+            while (matcher.find()) {
+                String s = matcher.group();
+                basicAssessment = basicAssessment + s;
+                strResult = strResult.replace(s,"");
+            }
+            basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "");
+
+            //除權息
+            String XDInfo = "";
+            if(strResult.contains("近1年殖利率")){
+                XDInfo = strResult.substring(0, strResult.indexOf("近1年殖利率"));
+                strResult = strResult.replace(XDInfo, "");
+            }
+            XDInfo = XDInfo.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "");
+
+            //殖利率
+            String yield = "";
+            pattern = Pattern.compile("近.*?</td>.*?</td>");
+            matcher = pattern.matcher(strResult);
+            while (matcher.find()) {
+                String s = matcher.group();
+                yield = yield + s;
+                strResult = strResult.replace(s,"");
+            }
+            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","");
+
+            //均線
+            String movingAVG = "\n"+strResult.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
+
+            strResult = "";
+
+            Item item = screener.getItems().get(0);
+            strResult = "◎" + stockNmae + " " + text;
+            strResult = strResult + "收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE();
+            strResult = strResult + "近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE();
+            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY();
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT();
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS();
+            strResult = strResult + "本益比(PER) :"+item.getVFLD_PER();
+            strResult = strResult + "每股淨值(PBR) :"+item.getVFLD_PBR();
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE();
+            strResult = strResult + "K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE();
+            strResult = strResult + "MACD :"+item.getVMACD();
+            strResult = strResult + basicAssessment;
+            strResult = strResult + XDInfo;
+            strResult = strResult + yield;
+            strResult = strResult + movingAVG;
+            //this.replyText(replyToken, EmojiUtils.emojify(strResult));
+            this.replyText(replyToken, strResult);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

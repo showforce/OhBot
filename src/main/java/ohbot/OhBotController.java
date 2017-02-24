@@ -1338,7 +1338,8 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             strResult = strResult + "本益比(PER)："+item.getVFLD_PER() + "\n";
             strResult = strResult + "每股淨值(PBR)："+item.getVFLD_PBR() + "\n";
             strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE)："+item.getVFLD_ROE() + "\n";
-            strResult = strResult + "K9值："+item.getVFLD_K9_UPDNRATE()+"D9值："+item.getVFLD_D9_UPDNRATE() + "\n";
+            strResult = strResult + "K9值："+item.getVFLD_K9_UPDNRATE() + "\n";
+            strResult = strResult + "D9值："+item.getVFLD_D9_UPDNRATE() + "\n";
             strResult = strResult + "MACD："+item.getVMACD() + "\n";
 
 
@@ -1395,7 +1396,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             //除權息
             String XDInfo = "";
             if(strContent.contains("近1年殖利率")){
-                XDInfo = strContent.substring(strContent.indexOf("近"), strContent.indexOf("近1年殖利率"));
+                XDInfo = strContent.substring(strContent.indexOf("除"), strContent.indexOf("近1年殖利率"));
                 strContent = strContent.replace(XDInfo, "");
             }
             XDInfo = XDInfo.replaceAll("</td></tr>","\n").replaceAll("<[^>]*>", "");

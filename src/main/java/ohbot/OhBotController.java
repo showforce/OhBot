@@ -1329,17 +1329,17 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             Screener screener = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"),Screener.class);
 
             Item item = screener.getItems().get(0);
-            strResult = "◎" + stockNmae + " " + text;
-            strResult = strResult + "收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE();
-            strResult = strResult + "近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE();
-            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY();
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT();
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS();
-            strResult = strResult + "本益比(PER) :"+item.getVFLD_PER();
-            strResult = strResult + "每股淨值(PBR) :"+item.getVFLD_PBR();
-            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE();
-            strResult = strResult + "K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE();
-            strResult = strResult + "MACD :"+item.getVMACD();
+            strResult = "◎" + stockNmae + " " + text + "\n";
+            strResult = strResult + "收盤 :"+item.getVFLD_CLOSE() + " 漲跌 :" + item.getVFLD_UP_DN() + " 漲跌幅 :" + item.getVFLD_UP_DN_RATE() + "\n";;
+            strResult = strResult + "近52周  最高 :"+item.getV52_WEEK_HIGH_PRICE()+" 最低 :"+item.getV52_WEEK_LOW_PRICE() + "\n";;
+            strResult = strResult + item.getVGET_MONEY_DATE()+" 營收 :"+item.getVGET_MONEY() + "\n";;
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 毛利率 :"+item.getVFLD_PROFIT() + "\n";;
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 每股盈餘（EPS) :"+item.getVFLD_EPS() + "\n";;
+            strResult = strResult + "本益比(PER) :"+item.getVFLD_PER() + "\n";;
+            strResult = strResult + "每股淨值(PBR) :"+item.getVFLD_PBR() + "\n";;
+            strResult = strResult + item.getVFLD_PRCQ_YMD() +" 股東權益報酬率(ROE) :"+item.getVFLD_ROE() + "\n";;
+            strResult = strResult + "K9值 :"+item.getVFLD_K9_UPDNRATE()+"D9值 :"+item.getVFLD_D9_UPDNRATE() + "\n";;
+            strResult = strResult + "MACD :"+item.getVMACD() + "\n";;
 
 
             url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
@@ -1359,8 +1359,8 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             log.info(String.valueOf(response.getStatusLine().getStatusCode()));
             httpEntity = response.getEntity();
             InputStream inputStream = httpEntity.getContent();
-            Header[] ss = response.getAllHeaders();
-            for(Header header:ss){
+            Header[] headers = response.getAllHeaders();
+            for(Header header:headers){
                 if(header.getName().contains("Content-Encoding")){
                     System.out.println(header.getName()+" "+header.getValue());
                     if(header.getValue().contains("gzip")){

@@ -1371,7 +1371,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             }
 
             //基本評估
-            String basicAssessment="\n";
+            String basicAssessment = "";
             pattern = Pattern.compile("<strong>.*?</strong>.*?</td>");
             matcher = pattern.matcher(strContent);
             while (matcher.find()) {
@@ -1379,7 +1379,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                 basicAssessment = basicAssessment + s;
                 strContent = strContent.replace(s,"");
             }
-            basicAssessment = basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
+            basicAssessment = "\n" + basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
 
             //除權息
             String XDInfo = "";

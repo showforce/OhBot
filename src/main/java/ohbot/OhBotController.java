@@ -1291,21 +1291,27 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             System.out.println(text);
             Pattern pattern = Pattern.compile("[\\d]{3,}");
             Matcher matcher = pattern.matcher(text);
-            String stockNmae="";
+            String stockName = "";
             if (matcher.find()) {
                 if (otcNoMap.get(text) != null) {
-                    stockNmae = otcNoMap.get(text);
+                    stockName = otcNoMap.get(text);
                 } else {
-                    stockNmae = tseNoMap.get(text);
+                    stockName = tseNoMap.get(text);
                 }
             } else {
                 if (otcNameMap.get(text) != null) {
-                    stockNmae = text;
+                    stockName = text;
                     text = otcNameMap.get(text);
                 } else {
-                    stockNmae = text;
+                    stockName = text;
                     text = tseNameMap.get(text);
                 }
+            }
+
+            pattern = Pattern.compile("[\\d]{3,}");
+            matcher = pattern.matcher(text);
+            if (!matcher.find()) {
+                return;
             }
 
             DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
@@ -1329,83 +1335,81 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             Screener screener = gson.fromJson(EntityUtils.toString(httpEntity, "utf-8"),Screener.class);
 
 
-
-
-            url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
-            httpget = new HttpGet(url);
-            log.info(url);
-            httpget.setHeader("Accept",
-                              "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-            httpget.setHeader("Accept-Encoding","gzip, deflate, sdch, br");
-            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
-            httpget.setHeader("Cache-Control", "max-age=0");
-            httpget.setHeader("Connection", "keep-alive");
-            httpget.setHeader("Host", "news.money-link.com.tw");
-            httpget.setHeader("Upgrade-Insecure-Requests", "1");
-            httpget.setHeader("User-Agent",
-                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
-            response = defaultHttpClient.execute(httpget);
-            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
-            httpEntity = response.getEntity();
-            InputStream inputStream = httpEntity.getContent();
-            Header[] headers = response.getAllHeaders();
-            for(Header header:headers){
-                if(header.getName().contains("Content-Encoding")){
-                    System.out.println(header.getName()+" "+header.getValue());
-                    if(header.getValue().contains("gzip")){
-                        inputStream = new GZIPInputStream(inputStream);
-                    }
-                }
-            }
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-            String newLine;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((newLine = bufferedReader.readLine()) != null) {
-                stringBuilder.append(newLine);
-            }
-            String strContent = stringBuilder.toString();
-
-            //切掉不要區塊
-            if (strContent.contains("<tbody>")) {
-                strContent = strContent.substring(strContent.indexOf("<tbody>"), strContent.length());
-            }
-
-            //基本評估
-            String basicAssessment = "";
-            pattern = Pattern.compile("<strong>.*?</strong>.*?</td>");
-            matcher = pattern.matcher(strContent);
-            while (matcher.find()) {
-                String s = matcher.group();
-                basicAssessment = basicAssessment + s;
-                strContent = strContent.replace(s,"");
-            }
-            basicAssessment = "\n" + basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
-
-            //除權息
-            String XDInfo = "";
-            if(strContent.contains("近1年殖利率")){
-                XDInfo = strContent.substring(strContent.indexOf("除"), strContent.indexOf("近1年殖利率"));
-                strContent = strContent.replace(XDInfo, "");
-            }
-            XDInfo = "\n" + XDInfo.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "");
-
-            //殖利率
-            String yield = "\n";
-            pattern = Pattern.compile("近.*?</td>.*?</td>");
-            matcher = pattern.matcher(strContent);
-            while (matcher.find()) {
-                String s = matcher.group();
-                yield = yield + s;
-                strContent = strContent.replace(s,"");
-            }
-            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","").replace("為銀行","");
-
-            //均線
-            String movingAVG = "\n"+strContent.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
+//            url="https://news.money-link.com.tw/yahoo/0061_"+text+".html";
+//            httpget = new HttpGet(url);
+//            log.info(url);
+//            httpget.setHeader("Accept",
+//                              "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//            httpget.setHeader("Accept-Encoding","gzip, deflate, sdch, br");
+//            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+//            httpget.setHeader("Cache-Control", "max-age=0");
+//            httpget.setHeader("Connection", "keep-alive");
+//            httpget.setHeader("Host", "news.money-link.com.tw");
+//            httpget.setHeader("Upgrade-Insecure-Requests", "1");
+//            httpget.setHeader("User-Agent",
+//                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+//            response = defaultHttpClient.execute(httpget);
+//            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+//            httpEntity = response.getEntity();
+//            InputStream inputStream = httpEntity.getContent();
+//            Header[] headers = response.getAllHeaders();
+//            for(Header header:headers){
+//                if(header.getName().contains("Content-Encoding")){
+//                    System.out.println(header.getName()+" "+header.getValue());
+//                    if(header.getValue().contains("gzip")){
+//                        inputStream = new GZIPInputStream(inputStream);
+//                    }
+//                }
+//            }
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+//            String newLine;
+//            StringBuilder stringBuilder = new StringBuilder();
+//            while ((newLine = bufferedReader.readLine()) != null) {
+//                stringBuilder.append(newLine);
+//            }
+//            String strContent = stringBuilder.toString();
+//
+//            //切掉不要區塊
+//            if (strContent.contains("<tbody>")) {
+//                strContent = strContent.substring(strContent.indexOf("<tbody>"), strContent.length());
+//            }
+//
+//            //基本評估
+//            String basicAssessment = "";
+//            pattern = Pattern.compile("<strong>.*?</strong>.*?</td>");
+//            matcher = pattern.matcher(strContent);
+//            while (matcher.find()) {
+//                String s = matcher.group();
+//                basicAssessment = basicAssessment + s;
+//                strContent = strContent.replace(s,"");
+//            }
+//            basicAssessment = "\n" + basicAssessment.replaceAll("</td>", "\n").replaceAll("<[^>]*>", "").replace("交易所","");
+//
+//            //除權息
+//            String XDInfo = "";
+//            if(strContent.contains("近1年殖利率")){
+//                XDInfo = strContent.substring(strContent.indexOf("除"), strContent.indexOf("近1年殖利率"));
+//                strContent = strContent.replace(XDInfo, "");
+//            }
+//            XDInfo = "\n" + XDInfo.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "");
+//
+//            //殖利率
+//            String yield = "\n";
+//            pattern = Pattern.compile("近.*?</td>.*?</td>");
+//            matcher = pattern.matcher(strContent);
+//            while (matcher.find()) {
+//                String s = matcher.group();
+//                yield = yield + s;
+//                strContent = strContent.replace(s,"");
+//            }
+//            yield = yield.replaceAll("</td>近","</td>\n近").replaceAll("<[^>]*>", "").replaceAll(" ","").replace("為銀行","");
+//
+//            //均線
+//            String movingAVG = "\n"+strContent.replaceAll("</td></tr>", "\n").replaceAll("<[^>]*>", "").replaceAll(" ","");
 
 
             Item item = screener.getItems().get(0);
-            strResult = "◎" + stockNmae + " " + text + "\n";
+            strResult = "◎" + stockName + " " + text + "\n";
             strResult = strResult + "收盤："+item.getVFLD_CLOSE() + " 漲跌：" + item.getVFLD_UP_DN() + " 漲跌幅：" + item.getVFLD_UP_DN_RATE() + "\n";
             strResult = strResult + "近52周  最高："+item.getV52_WEEK_HIGH_PRICE()+" 最低："+item.getV52_WEEK_LOW_PRICE() + "\n";
             strResult = strResult + item.getVGET_MONEY_DATE()+" 營收："+item.getVGET_MONEY() + "\n";
@@ -1417,10 +1421,10 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             strResult = strResult + "K9值："+item.getVFLD_K9_UPDNRATE() + "\n";
             strResult = strResult + "D9值："+item.getVFLD_D9_UPDNRATE() + "\n";
             strResult = strResult + "MACD："+item.getVMACD() + "\n";
-            strResult = strResult + movingAVG;
-            strResult = strResult + XDInfo;
-            strResult = strResult + yield;
-            strResult = strResult + basicAssessment;
+//            strResult = strResult + movingAVG;
+//            strResult = strResult + XDInfo;
+//            strResult = strResult + yield;
+//            strResult = strResult + basicAssessment;
             //this.replyText(replyToken, EmojiUtils.emojify(strResult));
             this.replyText(replyToken, strResult);
         } catch (Exception e) {

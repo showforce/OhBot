@@ -1192,16 +1192,20 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             if (matcher.find()) {   //如果是數字
                 if (otcNoMap.get(text) != null) {
                     companyType = "otc";
-                } else {
+                } else if (tseNoMap.get(text) != null) {
                     companyType = "tse";
+                } else {
+                    return;
                 }
             } else {    //非數字
                 if (otcNameMap.get(text) != null) {
                     companyType = "otc";
                     text = otcNameMap.get(text);
-                } else {
+                } else if (tseNameMap.get(text) != null) {
                     companyType = "tse";
                     text = tseNameMap.get(text);
+                } else {
+                    return;
                 }
             }
 
@@ -1295,16 +1299,20 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             if (matcher.find()) {
                 if (otcNoMap.get(text) != null) {
                     stockName = otcNoMap.get(text);
-                } else {
+                } else if (tseNoMap.get(text) != null) {
                     stockName = tseNoMap.get(text);
+                } else{
+                    return;
                 }
             } else {
                 if (otcNameMap.get(text) != null) {
                     stockName = text;
                     text = otcNameMap.get(text);
-                } else {
+                } else if (tseNameMap.get(text) != null) {
                     stockName = text;
                     text = tseNameMap.get(text);
+                } else {
+                    return;
                 }
             }
 

@@ -595,7 +595,7 @@ public class OhBotController {
         if (text.endsWith("座?") || text.endsWith("座？")) {
             star(text, replyToken);
         }
-        if (text.endsWith("油價?") || text.endsWith("油價？")) {
+        if (text.startsWith("油價?") || text.startsWith("油價？")) {
             taiwanoil(text, replyToken);
         }
 
@@ -624,9 +624,9 @@ public class OhBotController {
         if (text.endsWith("@?") || text.endsWith("@？")) {
             help2(text, replyToken);
         }
-        if (text.endsWith("#?") || text.endsWith("＃？")) {
-            help(text, replyToken);
-        }
+//        if (text.endsWith("#?") || text.endsWith("＃？")) {
+//            help(text, replyToken);
+//        }
     }
 
     @EventMapping

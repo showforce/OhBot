@@ -1690,8 +1690,8 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                         new CarouselColumn(imageUrl, "安安", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查油價", "查油價　輸入 油價?"),
-                                                   new MessageAction("查星座", "查氣象　輸入 天蠍座?"),
-                                                   new MessageAction("查星座", "查氣象　輸入 牡羊座?")
+                                                   new MessageAction("查星座", "查星座　輸入 天蠍座?"),
+                                                   new MessageAction("查星座", "查星座　輸入 牡羊座?")
                                            )
                         )
                 )

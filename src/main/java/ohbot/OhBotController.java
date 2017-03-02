@@ -1690,7 +1690,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                         new CarouselColumn(imageUrl, "安安", "你好",
                                            Arrays.asList(
                                                    new MessageAction("查油價", "查油價　輸入 油價? "),
-                                                   new MessageAction("查星座", "查星座　輸入 天蠍座?"),
+                                                   new MessageAction("查個股詳細資料", "查個股詳細資料　輸入 #2331? 或 #台積電?"),
                                                    new MessageAction("查星座", "查星座　輸入 牡羊座?")
                                            )
                         )

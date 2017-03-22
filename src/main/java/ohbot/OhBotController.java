@@ -1769,16 +1769,14 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             log.info(String.valueOf(response.getStatusLine().getStatusCode()));
             HttpEntity httpEntity = response.getEntity();
             strResult = EntityUtils.toString(httpEntity, "UTF-8");
-            strResult = strResult.substring(strResult.indexOf("<tr class='row1'>"), strResult.indexOf("活牛期貨</a></td>"));
+            strResult = strResult.substring(strResult.indexOf("<tr class='row1'>"), strResult.indexOf("鎳</a></td>"));
             strResult = strResult.replaceAll("<td align='left' nowrap>.*?\">", "");
             strResult = strResult.replaceAll("[\\s]{1,}", "");
             strResult = strResult.replace("</td></tr>", "\n");
-            strResult = strResult.replace("</a></td><tdnowrap>", "  ");
-            strResult = strResult.replaceAll("</td><tdclass=\"changeup\"nowrap>", "  +");
-            strResult = strResult.replaceAll("</td><tdclass=\"changedown\"nowrap>", "  ");
-            strResult = strResult.replace("</td><tdnowrap>", "  ");
+            strResult = strResult.replace("</a></td><tdnowrap>", "　　");
+            strResult = strResult.replaceAll("</td><tdclass=\"change(up|DOWN)\"nowrap>.*", "");
             strResult = strResult.replaceAll("<[^>]*>", "");
-            strResult = "商品 買價 漲跌 幅度 更新時間\n" + strResult;
+            strResult = "商品 買價\n" + strResult;
 
             this.replyText(replyToken, strResult);
         } catch (IOException e) {

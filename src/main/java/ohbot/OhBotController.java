@@ -1769,7 +1769,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             log.info(String.valueOf(response.getStatusLine().getStatusCode()));
             HttpEntity httpEntity = response.getEntity();
             strResult = EntityUtils.toString(httpEntity, "UTF-8");
-            strResult = strResult.substring(strResult.indexOf("<tr class='row1'>"), strResult.indexOf("鈀</a></td>"));
+            strResult = strResult.substring(strResult.indexOf("<tr class='row1'>"), strResult.indexOf("活牛期貨</a></td>"));
             strResult = strResult.replaceAll("<td align='left' nowrap>.*?\">", "");
             strResult = strResult.replaceAll("[\\s]{1,}", "");
             strResult = strResult.replace("</td></tr>", "\n");

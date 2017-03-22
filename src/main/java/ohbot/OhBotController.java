@@ -1773,10 +1773,10 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             strResult = strResult.replaceAll("<td align='left' nowrap>.*?\">", "");
             strResult = strResult.replaceAll("[\\s]{1,}", "");
             strResult = strResult.replace("</td></tr>", "\n");
-            strResult = strResult.replace("</a></td><tdnowrap>", " ");
-            strResult = strResult.replaceAll("</td><tdclass=\"changeup\"nowrap>", " ");
-            strResult = strResult.replaceAll("</td><tdclass=\"changedown\"nowrap>", " ");
-            strResult = strResult.replace("</td><tdnowrap>", " ");
+            strResult = strResult.replace("</a></td><tdnowrap>", "  ");
+            strResult = strResult.replaceAll("</td><tdclass=\"changeup\"nowrap>", "  +");
+            strResult = strResult.replaceAll("</td><tdclass=\"changedown\"nowrap>", "  ");
+            strResult = strResult.replace("</td><tdnowrap>", "  ");
             strResult = strResult.replaceAll("<[^>]*>", "");
             strResult = "商品 買價 漲跌 幅度 更新時間\n" + strResult;
 

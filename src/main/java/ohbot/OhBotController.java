@@ -1289,14 +1289,14 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                     range = " " + "-";
                 } else if (diff > 0) {
                     change = " +" + decimalFormat.format(diff);
-                    if (nowPrice == Double.parseDouble(msgArray.getU())) {
+                    if (msgArray.getU() != null && nowPrice == Double.parseDouble(msgArray.getU())) {
                         range = EmojiUtils.emojify(":heart:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }else{
                         range = EmojiUtils.emojify(":chart_with_upwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }
                 } else {
                     change = " -" + decimalFormat.format(diff*(-1));
-                    if (nowPrice == Double.parseDouble(msgArray.getW())) {
+                    if (msgArray.getW() != null && nowPrice == Double.parseDouble(msgArray.getW())) {
                         range = EmojiUtils.emojify(":green_heart:") + decimalFormat.format((diff / yesterday)*100) + "%";
                     }else{
                         range = EmojiUtils.emojify(":chart_with_downwards_trend:") + decimalFormat.format((diff / yesterday)*100) + "%";

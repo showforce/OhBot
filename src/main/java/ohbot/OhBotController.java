@@ -571,6 +571,43 @@ public class OhBotController {
         return strResult;
     }
 
+    @RequestMapping("/metal")
+    public String mmetal() {
+        String strResult = "";
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            String url = "http://www.stockq.org/market/commodity.php";
+            log.info(url);
+            HttpGet httpget = new HttpGet(url);
+            httpget.setHeader("Host", "www.stockq.org");
+            httpget.setHeader("Connection", "keep-alive");
+            httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            httpget.setHeader("User-Agent",
+                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+            httpget.setHeader("Referer", "http://www.stockq.org/market/commodity.php");
+            httpget.setHeader("Accept-Encoding", "gzip, deflate, sdch");
+            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4,zh-CN;q=0.2");
+            CloseableHttpResponse response = httpClient.execute(httpget);
+            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+            HttpEntity httpEntity = response.getEntity();
+            strResult = EntityUtils.toString(httpEntity, "UTF-8");
+            strResult = strResult.substring(strResult.indexOf("<tr class='row1'>"), strResult.indexOf("鈀</a></td>"));
+            strResult = strResult.replaceAll("<td align='left' nowrap>.*?\">", "");
+            strResult = strResult.replaceAll("[\\s]{1,}", "");
+            strResult = strResult.replace("</td></tr>", "\n");
+            strResult = strResult.replace("</a></td><tdnowrap>", " ");
+            strResult = strResult.replaceAll("</td><tdclass=\"changeup\"nowrap>", " ");
+            strResult = strResult.replaceAll("</td><tdclass=\"changedown\"nowrap>", " ");
+            strResult = strResult.replace("</td><tdnowrap>", " ");
+            strResult = strResult.replaceAll("<[^>]*>", "");
+            System.out.println(strResult);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return strResult;
+    }
+
     @EventMapping
     public void handleDefaultMessageEvent(Event event) {
         log.info("Received message(Ignored): {}", event);
@@ -623,6 +660,10 @@ public class OhBotController {
 
         if (text.endsWith("@?") || text.endsWith("@？")) {
             help2(text, replyToken);
+        }
+
+        if ((text.startsWith("貴金屬?") && text.endsWith("貴金屬?")) || (text.startsWith("貴金屬？") && text.endsWith("貴金屬？")) ) {
+            metal(text, replyToken);
         }
 //        if (text.endsWith("#?") || text.endsWith("＃？")) {
 //            help(text, replyToken);
@@ -1706,5 +1747,42 @@ This code is public domain: you are free to use, link and/or modify it in any wa
         );
         TemplateMessage templateMessage = new TemplateMessage("The function Only on mobile device ! ", carouselTemplate);
         this.reply(replyToken, templateMessage);
+    }
+
+    private void metal(String text, String replyToken) throws IOException {
+        log.info(text);
+        String strResult = "";
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            String url = "http://www.stockq.org/market/commodity.php";
+            log.info(url);
+            HttpGet httpget = new HttpGet(url);
+            httpget.setHeader("Host", "www.stockq.org");
+            httpget.setHeader("Connection", "keep-alive");
+            httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            httpget.setHeader("User-Agent",
+                              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+            httpget.setHeader("Referer", "http://www.stockq.org/market/commodity.php");
+            httpget.setHeader("Accept-Encoding", "gzip, deflate, sdch");
+            httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4,zh-CN;q=0.2");
+            CloseableHttpResponse response = httpClient.execute(httpget);
+            log.info(String.valueOf(response.getStatusLine().getStatusCode()));
+            HttpEntity httpEntity = response.getEntity();
+            strResult = EntityUtils.toString(httpEntity, "UTF-8");
+            strResult = strResult.substring(strResult.indexOf("<tr class='row1'>"), strResult.indexOf("鈀</a></td>"));
+            strResult = strResult.replaceAll("<td align='left' nowrap>.*?\">", "");
+            strResult = strResult.replaceAll("[\\s]{1,}", "");
+            strResult = strResult.replace("</td></tr>", "\n");
+            strResult = strResult.replace("</a></td><tdnowrap>", " ");
+            strResult = strResult.replaceAll("</td><tdclass=\"changeup\"nowrap>", " ");
+            strResult = strResult.replaceAll("</td><tdclass=\"changedown\"nowrap>", " ");
+            strResult = strResult.replace("</td><tdnowrap>", " ");
+            strResult = strResult.replaceAll("<[^>]*>", "");
+            strResult = "商品 買價 漲跌 幅度 更新時間\n" + strResult;
+
+            this.replyText(replyToken, strResult);
+        } catch (IOException e) {
+            throw e;
+        }
     }
 }

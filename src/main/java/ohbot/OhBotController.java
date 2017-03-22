@@ -1774,7 +1774,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
             strResult = strResult.replaceAll("[\\s]{1,}", "");
             strResult = strResult.replace("</td></tr>", "\n");
             strResult = strResult.replace("</a></td><tdnowrap>", "　　");
-            strResult = strResult.replaceAll("</td><tdclass=\"change(up|DOWN)\"nowrap>.*", "");
+            strResult = strResult.replaceAll("</td><tdclass=\"change(up|down)\"nowrap>.*", "");
             strResult = strResult.replaceAll("<[^>]*>", "");
             strResult = "商品 買價\n" + strResult;
 

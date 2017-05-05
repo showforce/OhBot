@@ -1643,7 +1643,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                     strResult = EntityUtils.toString(httpEntity, "utf-8");
                     strResult = strResult.substring(strResult.indexOf("<td>現鈔買入</td>"), strResult.length());
                     strResult = strResult.substring(0, strResult.indexOf("</table>"));
-                    strResult = strResult.replaceAll("</a></td>", " : ");
+                    strResult = strResult.replaceAll("</a></td>", "：");
                     strResult = strResult.replaceAll("<[^>]*>", "");
                     strResult = strResult.replaceAll("[\\s]{1,}", "");
                     strResult = strResult.replaceAll("現鈔賣出", "\n:money_with_wings:鬼島冥紙買"+country+"去");

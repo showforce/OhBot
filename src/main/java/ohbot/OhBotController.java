@@ -1646,8 +1646,8 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                     strResult = strResult.replaceAll("</a></td>", ":moneybag:");
                     strResult = strResult.replaceAll("<[^>]*>", "");
                     strResult = strResult.replaceAll("[\\s]{1,}", "");
-                    strResult = strResult.replaceAll("現鈔賣出", "\n:money_with_wings:要換外幣去");
-                    strResult = strResult.replaceAll("現鈔買入", ":dollar:換鬼島幣去");
+                    strResult = strResult.replaceAll("現鈔賣出", "\n:money_with_wings:外幣換鬼島冥紙去");
+                    strResult = strResult.replaceAll("現鈔買入", ":dollar:鬼島冥紙買外幣去");
 
                     this.replyText(replyToken, EmojiUtils.emojify(strResult));
                 }

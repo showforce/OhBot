@@ -1617,6 +1617,10 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                         country="GBP";
                         break;
                     }
+					case "法郎": {
+                        country="CHF";
+                        break;
+                    }
                     case "韓元": {
                         country="KRW";
                         break;

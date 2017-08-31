@@ -185,7 +185,8 @@ public class OhBotController {
                 }
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
-                String url="http://mis.twse.com.tw/stock/index.jsp";
+                //String url="http://mis.twse.com.tw/stock/index.jsp";
+                String url = String.format("http://%s/stock/api/getStockInfo.jsp?ex_ch=tse_t00.tw%%7cotc_o00.tw%%7ctse_FRMSA.tw&json=1&delay=0&_=%d", "mis.twse.com.tw", new java.util.Date().getTime());
                 log.info(url);
                 HttpGet httpget = new HttpGet(url);
                 httpget.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
@@ -197,10 +198,11 @@ public class OhBotController {
                 httpget.setHeader("Upgrade-Insecure-Requests", "1");
                 httpget.setHeader("User-Agent",
                                   "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+                httpget.setHeader("Referer",String.format("http://%s/stock/fibest.jsp?lang=zh_tw", "mis.twse.com.tw"));
                 CloseableHttpResponse response = httpClient.execute(httpget);
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
                 url = "http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=" + companyType + "_" + stock +
-                      ".tw&_=" + Instant.now().toEpochMilli();
+                      ".tw&json=1&delay=0&_=" + Instant.now().toEpochMilli();
                 log.info(url);
                 httpget = new HttpGet(url);
                 response = httpClient.execute(httpget);

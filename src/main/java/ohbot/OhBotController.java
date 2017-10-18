@@ -29,6 +29,7 @@ import ohbot.aqiObj.Datum;
 import ohbot.stockObj.*;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -36,6 +37,7 @@ import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -48,6 +50,7 @@ import retrofit2.Response;
 
 import javax.net.ssl.*;
 import java.io.*;
+import java.net.URI;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormat;
@@ -183,10 +186,9 @@ public class OhBotController {
                         stock = tseNameMap.get(stock);
                     }
                 }
-
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                //String url="http://mis.twse.com.tw/stock/index.jsp";
-                String url = String.format("http://%s/stock/api/getStockInfo.jsp?ex_ch=tse_t00.tw%%7cotc_o00.tw%%7ctse_FRMSA.tw&json=1&delay=0&_=%d", "mis.twse.com.tw", new java.util.Date().getTime());
+                CookieStore cookieStore = new BasicCookieStore();
+                CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+                String url="http://mis.twse.com.tw/stock/index.jsp";
                 log.info(url);
                 HttpGet httpget = new HttpGet(url);
                 httpget.setHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
@@ -198,20 +200,26 @@ public class OhBotController {
                 httpget.setHeader("Upgrade-Insecure-Requests", "1");
                 httpget.setHeader("User-Agent",
                                   "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
-                httpget.setHeader("Referer",String.format("http://%s/stock/fibest.jsp?lang=zh_tw", "mis.twse.com.tw"));
                 CloseableHttpResponse response = httpClient.execute(httpget);
+                HttpEntity httpEntity = response.getEntity();
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
                 url = "http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=" + companyType + "_" + stock +
                       ".tw&json=1&delay=0&_=" + Instant.now().toEpochMilli();
                 log.info(url);
                 httpget = new HttpGet(url);
+                httpget.setHeader("Accept","application/json, text/javascript, */*; q=0.01");
+                httpget.setHeader("Accept-Encoding","gzip, deflate, sdch");
+                httpget.setHeader("Accept-Language", "zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4");
+                httpget.setHeader("User-Agent",
+                        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36");
+                httpget.setHeader("Referer", "http://mis.twse.com.tw/stock/fibest.jsp?stock="+stock);
                 response = httpClient.execute(httpget);
                 log.info(String.valueOf(response.getStatusLine().getStatusCode()));
-                HttpEntity httpEntity = response.getEntity();
+                httpEntity = response.getEntity();
                 strResult = "";
 
                 Gson gson = new GsonBuilder().create();
-                String s =EntityUtils.toString(httpEntity, "utf-8");
+                String s = EntityUtils.toString(httpEntity, "utf-8");
                 System.out.println(s);
                 StockData stockData = gson.fromJson(s, StockData.class);
                 for(MsgArray msgArray:stockData.getMsgArray()){
@@ -507,9 +515,9 @@ public class OhBotController {
                 AqiResult aqiResult = gson.fromJson(strResult, AqiResult.class);
                 List<Datum> areaData = new ArrayList<>();
                 for(Datum datums:aqiResult.getData()){
-                    if(datums.getAreakey().equals("area")){
+                    if(datums.getAreakey().contains(area)){
                         areaData.add(datums);
-                    }
+                }
                 }
                 strResult = "";
                 for (Datum datums : areaData) {
@@ -1552,7 +1560,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                     AqiResult aqiResult = gson.fromJson(pageContent, AqiResult.class);
                     List<Datum> areaData = new ArrayList<>();
                     for(Datum datums:aqiResult.getData()){
-                        if(datums.getAreakey().equals(areakey)){
+                        if(datums.getAreakey().contains(areakey)){
                             areaData.add(datums);
                         }
                     }

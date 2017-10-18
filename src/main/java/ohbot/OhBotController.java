@@ -514,10 +514,10 @@ public class OhBotController {
                 Gson gson = new GsonBuilder().create();
                 AqiResult aqiResult = gson.fromJson(strResult, AqiResult.class);
                 List<Datum> areaData = new ArrayList<>();
-                for(Datum datums:aqiResult.getData()){
-                    if(datums.getAreakey().contains(area)){
+                for (Datum datums : aqiResult.getData()) {
+                    if (datums.getAreakey().contains(area)) {
                         areaData.add(datums);
-                }
+                    }
                 }
                 strResult = "";
                 for (Datum datums : areaData) {
@@ -1539,6 +1539,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                     strResult = "義大利?維大力? \n請輸入 這些地區：\n北部 竹苗 中部 \n雲嘉南 高屏 花東 \n宜蘭 外島";
                     this.replyText(replyToken, strResult);
                 }else{
+                    System.out.println(areakey);
                     CloseableHttpClient httpClient = HttpClients.createDefault();
                     String url="http://taqm.epa.gov.tw/taqm/aqs.ashx?lang=tw&act=aqi-epa";
                     log.info(url);
@@ -1564,6 +1565,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
                             areaData.add(datums);
                         }
                     }
+                    System.out.println(areaData.size());
                     for (Datum datums : areaData) {
                         String aqiStyle = datums.getAQI();
                         if (Objects.equals(aqiStyle, "")) {

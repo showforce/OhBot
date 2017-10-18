@@ -417,7 +417,7 @@ public class OhBotController {
         String strResult = "";
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
-            String url = "http://www.tse.com.tw/api/get.php?method=home_summary";
+            String url = "http://www.twse.com.tw/rsrc/data/zh/home/summary.json?_="+Instant.now().toEpochMilli();
             log.info(url);
             HttpGet httpget = new HttpGet(url);
             httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
@@ -1678,7 +1678,7 @@ This code is public domain: you are free to use, link and/or modify it in any wa
         String strResult = "";
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
-            String url = "http://www.tse.com.tw/api/get.php?method=home_summary";
+            String url = "http://www.twse.com.tw/rsrc/data/zh/home/summary.json?_="+Instant.now().toEpochMilli();
             log.info(url);
             HttpGet httpget = new HttpGet(url);
             httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
